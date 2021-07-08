@@ -20,7 +20,7 @@ Run from source:
 
 1. Clone git repo and cd into cloned repo
 2. `npm i`
-3. `npm run start`
+3. `npm run local`
 
 Install as shell command from source:
 

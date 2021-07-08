@@ -26,7 +26,8 @@ Install as shell command from source:
 
 1. Clone git repo and cd into cloned repo
 2. `npm i`
-3. `npm i -g`
+3. `npx tsc`
+4. `npm i -g`
 
 ## Prerequisites
 

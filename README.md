@@ -12,6 +12,10 @@ This project should run on every Linux platform.
 It is implmented and tested with WSL2 - Ubuntu.
 Therefore it should run also in headaless environments.
 
+Install as shell command from npm:
+
+`npm i -g btpcflogin`
+
 Run from source:
 
 1. Clone git repo and cd into cloned repo

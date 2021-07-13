@@ -1,6 +1,6 @@
 {
   "name": "btpcflogin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Easy login to SAP BTP Cloud Foundry (cf cli) in Linux",
   "author": "Marcus Schölzel <marcus.schoelzel@gmx.de>",
   "repository": {

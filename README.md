@@ -9,8 +9,8 @@ After installation you can use the shell command `btpcflogin` to get a guided lo
 ## Installation
 
 This project should run on every Linux platform.
-It is implmented and tested with WSL2 - Ubuntu.
-Therefore it should run also in headaless environments.
+It is implemented and tested with WSL2 - Ubuntu.
+Therefore it should run also in headless environments.
 
 Install as shell command from npm:
 

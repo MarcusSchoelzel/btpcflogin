@@ -10,6 +10,9 @@ import util from "util"
 import child_process, { spawnSync } from "child_process"
 
 const exec = util.promisify(child_process.exec)
+function isStdError(error: any): error is { stderr: string } {
+    return !!error.stderr
+}
 
 try {
 
@@ -24,23 +27,25 @@ try {
         initial: 7,
         choices:
             [
-                { "name": "ap11", "message": "ap11 - Asia Pacific (Singapore)", "hint": "Amazon Web Services" },
-                { "name": "ap12", "message": "ap12 - Asia Pacific (Seoul) ", "hint": "Amazon Web Services" },
-                { "name": "ap10", "message": "ap10 - Australia (Sydney)", "hint": "Amazon Web Services" },
-                { "name": "ap20", "message": "ap20 - Australia (Sydney)", "hint": "Microsoft Azure" },
-                { "name": "br10", "message": "br10 - Brazil (São Paulo)", "hint": "Amazon Web Services" },
-                { "name": "ca10", "message": "ca10 - Canada (Montreal)", "hint": "Amazon Web Services" },
-                { "name": "cn40", "message": "cn40 - China (Shanghai)", "hint": "Alibaba Cloud" },
-                { "name": "eu10", "message": "eu10 - Europe (Frankfurt)", "hint": "Amazon Web Services" },
-                { "name": "eu11", "message": "eu11 - Europe (Frankfurt)", "hint": "Amazon Web Services" },
-                { "name": "eu20", "message": "eu20 - Europe (Netherlands)", "hint": "Microsoft Azure" },
-                { "name": "jp10", "message": "jp10 - Japan (Tokyo)", "hint": "Amazon Web Services" },
-                { "name": "jp20", "message": "jp20 - Japan (Tokyo)", "hint": "Microsoft Azure" },
-                { "name": "ap21", "message": "ap21 - Singapore", "hint": "Microsoft Azure" },
-                { "name": "us10", "message": "us10 - US East (VA)", "hint": "Amazon Web Services" },
-                { "name": "us21", "message": "us21 - US East (VA)", "hint": "Microsoft Azure" },
-                { "name": "us20", "message": "us20 - US West (WA)", "hint": "Microsoft Azure" },
-                { "name": "us30", "message": "us30 - US Central (IA)", "hint": "Google Cloud Platform" }
+                { "name": "ap11"    , "message": "ap11     - Asia Pacific (Singapore)", "hint": "Amazon Web Services" },
+                { "name": "ap12"    , "message": "ap12     - Asia Pacific (Seoul) ", "hint": "Amazon Web Services" },
+                { "name": "ap10"    , "message": "ap10     - Australia (Sydney)", "hint": "Amazon Web Services" },
+                { "name": "ap20"    , "message": "ap20     - Australia (Sydney)", "hint": "Microsoft Azure" },
+                { "name": "br10"    , "message": "br10     - Brazil (São Paulo)", "hint": "Amazon Web Services" },
+                { "name": "ca10"    , "message": "ca10     - Canada (Montreal)", "hint": "Amazon Web Services" },
+                { "name": "cn40"    , "message": "cn40     - China (Shanghai)", "hint": "Alibaba Cloud" },
+                { "name": "eu10"    , "message": "eu10     - Europe (Frankfurt)", "hint": "Amazon Web Services" },
+                { "name": "eu10-004", "message": "eu10-004 - Europe (Frankfurt)", "hint": "Amazon Web Services" },
+                { "name": "eu11"    , "message": "eu11     - Europe (Frankfurt)", "hint": "Amazon Web Services" },
+                { "name": "eu20"    , "message": "eu20     - Europe (Netherlands)", "hint": "Microsoft Azure" },
+                { "name": "eu30"    , "message": "eu30     - Europe (Frankfurt)", "hint": "Google Cloud" },
+                { "name": "jp10"    , "message": "jp10     - Japan (Tokyo)", "hint": "Amazon Web Services" },
+                { "name": "jp20"    , "message": "jp20     - Japan (Tokyo)", "hint": "Microsoft Azure" },
+                { "name": "ap21"    , "message": "ap21     - Singapore", "hint": "Microsoft Azure" },
+                { "name": "us10"    , "message": "us10     - US East (VA)", "hint": "Amazon Web Services" },
+                { "name": "us21"    , "message": "us21     - US East (VA)", "hint": "Microsoft Azure" },
+                { "name": "us20"    , "message": "us20     - US West (WA)", "hint": "Microsoft Azure" },
+                { "name": "us30"    , "message": "us30     - US Central (IA)", "hint": "Google Cloud" }
             ]
     })).selection
     const btpRegionDomain = btpRegionCode + ((btpRegionCode === 'cn40') ? '.platform.sapcloud.cn' : '.hana.ondemand.com')
@@ -50,7 +55,7 @@ try {
     try {
         await exec('cf api api.cf.' + btpRegionDomain)
     } catch (error) {
-        if (error.stderr) {
+        if (isStdError(error)) {
             throw error.stderr
         } else {
             throw error
@@ -87,9 +92,8 @@ try {
     try {
         await exec('cf auth \"' + btpCredentials[1].slice(10) + '\" \"' + btpCredentials[0] + '\"')
     } catch (error) {
-        let errorObj = JSON.parse(error.stderr);
-        if (errorObj.error === 'invalid_grant') {
-            throw errorObj.error_description
+        if (isStdError(error) && JSON.parse(error.stderr).error === 'invalid_grant') {
+            throw JSON.parse(error.stderr).error_description
         } else {
             throw error
         }

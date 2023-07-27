@@ -20,7 +20,7 @@ try {
     console.log(chalk.cyanBright(figlet.textSync('SAP BTP CF', { font: "Poison" })))
 
     const btpRegionCode = (await Enquirer.prompt<{ selection: string }>({
-        type: 'select',
+        type: 'autocomplete',
         name: 'selection',
         // https://help.sap.com/viewer/65de2977205c403bbc107264b8eccf4b/LATEST/en-US/350356d1dc314d3199dca15bd2ab9b0e.html
         message: 'Choose BTP Cloud Foundry region',

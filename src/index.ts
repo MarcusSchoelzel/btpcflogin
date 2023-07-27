@@ -95,7 +95,7 @@ try {
     const authProgress = new clui.Spinner('Authenticating you, please wait...')
     authProgress.start()
     try {
-        await exec('cf auth \"' + btpCredentials[1].slice(10) + '\" \"' + btpCredentials[0] + '\"')
+        await exec(`cf auth "${btpCredentials[1].slice(10)}" "${btpCredentials[0].replace(/"/g,`\\$&`)}"`)
     } catch (error) {
         if (isStdError(error) && JSON.parse(error.stderr).error === 'invalid_grant') {
             throw JSON.parse(error.stderr).error_description

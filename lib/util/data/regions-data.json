@@ -1,0 +1,132 @@
+[
+  {
+    "name": "ap11",
+    "message": "ap11     - Asia Pacific (Singapore)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "ap12",
+    "message": "ap12     - Asia Pacific (Seoul) ",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "ap10",
+    "message": "ap10     - Australia (Sydney)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "ap20",
+    "message": "ap20     - Australia (Sydney)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "br10",
+    "message": "br10     - Brazil (São Paulo)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "ca10",
+    "message": "ca10     - Canada (Montreal)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "cn40",
+    "message": "cn40     - China (Shanghai)",
+    "hint": "Alibaba Cloud"
+  },
+  {
+    "name": "eu10",
+    "message": "eu10     - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "eu10-002",
+    "message": "eu10-002 - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "eu10-003",
+    "message": "eu10-003 - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "eu10-004",
+    "message": "eu10-004 - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "eu11",
+    "message": "eu11     - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "eu20",
+    "message": "eu20     - Europe (Netherlands)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "eu20-001",
+    "message": "eu20-001 - Europe (Netherlands)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "eu30",
+    "message": "eu30     - Europe (Frankfurt)",
+    "hint": "Google Cloud"
+  },
+  {
+    "name": "in30",
+    "message": "in30     - India (Mumbai)",
+    "hint": "Google Cloud"
+  },
+  {
+    "name": "jp10",
+    "message": "jp10     - Japan (Tokyo)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "jp20",
+    "message": "jp20     - Japan (Tokyo)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "ap21",
+    "message": "ap21     - Singapore",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "ch20",
+    "message": "ch20     - Switzerland (Zurich)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us10",
+    "message": "us10     - US East (VA)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "us10-001",
+    "message": "us10-001 - US East (VA)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "us10-002",
+    "message": "us10-002 - US East (VA)",
+    "hint": "Amazon Web Services"
+  },
+  {
+    "name": "us21",
+    "message": "us21     - US East (VA)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us20",
+    "message": "us20     - US West (WA)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us30",
+    "message": "us30     - US Central (IA)",
+    "hint": "Google Cloud"
+  }
+]

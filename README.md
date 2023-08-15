@@ -29,6 +29,33 @@ Install as shell command from source:
 3. `npx tsc`
 4. `npm i -g`
 
+## Available Commands
+
+- `login` (default)  
+  Starts complete Login to Cloud Foundry. As this is the default command it can be ommitted and is triggered by executing `btpcflogin`.
+
+- `add-login`  
+  Interactively adds new `pass` login to the config store.
+
+- `add-origin`  
+  Adds new origin of a custom identity provider to config store. If at least one origin is maintained, it will queried after the login password has been chosen
+
+- `t` (target)  
+  Interactive setting of new target (org and space), by using the current API region and logon token. (see `cf t`)
+
+### Example calls
+
+```sh
+# Login
+btpcflogin
+
+# choose target
+btpcflogin t
+
+# Add new 'pass' login
+btpcflogin add-login
+```
+
 ## Prerequisites
 
 [Node.js](https://nodejs.org/en/download/package-manager/#nvm) runtime 14 or higher.
@@ -51,6 +78,8 @@ You have to specify the full relative path to the file (as printed by `pass show
     ]
 }
 ```
+
+**HINT**: use the command `btpcflogin add-login` to prevent entering a false pass login to the file
 
 It is assumed that the login data is stored in the following format in a pass file:
 

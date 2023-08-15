@@ -17,15 +17,13 @@ class ConfigStoreProxy {
   }
   /**
    * Retrieves stored 'pass' logins for cli configstore
-   * @param includeSsoKey
-   * @returns
    */
-  getLogins(includeSsoKey = false): Logins {
+  getLogins(): Logins {
     const storedLogins = this.config.get(PASS_LOGINS_STORE_KEY) ?? [];
 
     this.assertsStoreValueIsArray(storedLogins, PASS_LOGINS_STORE_KEY);
 
-    return includeSsoKey ? [SSO_LOGIN_KEY, ...storedLogins] : storedLogins;
+    return storedLogins;
   }
 
   getOrigins(): Origins {

@@ -26,7 +26,7 @@ export async function cfLogin() {
         type: "select",
         name: "selection",
         message: "Choose login user",
-        choices: cliConfigStore.getLogins(true)
+        choices: [{ name: SSO_LOGIN_KEY, hint: "Single Sign On with Temporary code" }, ...cliConfigStore.getLogins()]
       })
     ).selection;
 

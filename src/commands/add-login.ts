@@ -18,7 +18,7 @@ export async function addLogin() {
     if (fs.existsSync(storeDirectory)) {
       // uses 'tree' util to retrieve directory contents as JSON string
       const passwordStoreTreeJson = spawnSync("tree", ["-J", storeDirectory], {
-        stdio: ["inherit", "pipe", "pipe"]
+        stdio: ["inherit", "pipe", "pipe"],
       }).stdout.toString();
       const passwordStoreTree = JSON.parse(passwordStoreTreeJson) as DirTreeFile[];
       const possibleLogins: string[] = [];
@@ -33,7 +33,7 @@ export async function addLogin() {
             type: "select",
             name: "selection",
             message: "Select 'pass' login",
-            choices: possibleLogins
+            choices: possibleLogins,
           })
         ).selection;
 

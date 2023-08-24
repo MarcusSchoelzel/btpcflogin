@@ -11,7 +11,7 @@ export async function addOrigin() {
       await Enquirer.prompt<{ selection: string }>({
         type: "input",
         name: "selection",
-        message: "Enter origin of custom Identity Provider"
+        message: "Enter origin of custom Identity Provider",
       })
     ).selection;
 

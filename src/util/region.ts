@@ -1,10 +1,11 @@
 import Enquirer from "enquirer";
 import path from "path";
 import fs from "fs";
-import clui from "clui";
+import { spawnSync } from "child_process";
+import ora from "ora";
 
+import { getDirname } from "./helper.js";
 import { isStdError } from "./error.js";
-import { exec, getDirname } from "./helper.js";
 
 /**
  * Prompts for Cloud Foundry API region
@@ -15,11 +16,11 @@ export async function chooseCfApiRegion(): Promise<{ apiRegionCode: string; apiR
   const apiRegionCode = await getRegionCode();
   const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
 
-  const apiProgress = new clui.Spinner("Switching region, please wait...");
-  apiProgress.start();
+  const apiProgress = ora("Switching region, please wait...").start();
 
   try {
-    await exec("cf api api.cf." + apiRegionDomain);
+    const error = spawnSync("cf", ["api", `api.cf.${apiRegionDomain}`]).stderr?.toString();
+    if (error) throw error;
   } catch (error) {
     if (isStdError(error)) {
       throw error.stderr;
@@ -36,7 +37,7 @@ export async function chooseCfApiRegion(): Promise<{ apiRegionCode: string; apiR
 
 /**
  * Triggers region selection via prompt
- * Regions are maintained in file /lib/regions-data.json
+ * Regions are maintained in file /data/regions-data.json
  * see https://help.sap.com/viewer/65de2977205c403bbc107264b8eccf4b/LATEST/en-US/350356d1dc314d3199dca15bd2ab9b0e.html
  *
  * @returns chosen Cloud Foundry region via prompt
@@ -50,11 +51,11 @@ async function getRegionCode(): Promise<string> {
       initial: 7,
       choices: JSON.parse(
         fs
-          .readFileSync(path.join(getDirname(import.meta.url), "data", "regions-data.json"), {
-            encoding: "utf-8"
+          .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {
+            encoding: "utf-8",
           })
-          .toString()
-      )
+          .toString(),
+      ),
     })
   ).selection;
 }

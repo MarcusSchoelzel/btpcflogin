@@ -1,10 +1,7 @@
 import Enquirer from "enquirer";
 import chalk from "chalk";
-import clui from "clui";
-import util from "util";
-import child_process from "child_process";
-
-const exec = util.promisify(child_process.exec);
+import ora from "ora";
+import { spawnSync } from "child_process";
 
 /**
  * Changes the current target of the Cloud Foundry CLI via
@@ -21,7 +18,7 @@ export async function setCfTarget() {
 
       await selectOrg(cfOrgs);
 
-      let cfSpaces = (await exec("cf spaces")).stdout.split("\n");
+      let cfSpaces = spawnSync("cf", ["spaces"]).stdout?.toString().split("\n");
       if (cfSpaces[2] === "No spaces found.") {
         console.log(chalk.yellowBright(cfSpaces[2]));
       } else {
@@ -29,7 +26,7 @@ export async function setCfTarget() {
         await selectSpace(cfSpaces);
       }
     }
-    console.log(chalk.cyanBright((await exec("cf t")).stdout));
+    console.log(chalk.cyanBright(spawnSync("cf", ["t"]).stdout.toString()));
   } catch (error) {
     console.error(chalk.redBright(error));
   }
@@ -41,11 +38,11 @@ export async function setCfTarget() {
  * @returns list of found orgs
  */
 async function getOrgs() {
-  const orgFinderProgress = new clui.Spinner("Selecting orgs, please wait...");
-  orgFinderProgress.start();
+  const orgFinderProgress = ora("Selecting orgs, please wait...").start();
+
   let cfOrgs: string[];
   try {
-    cfOrgs = (await exec("cf orgs")).stdout.split("\n");
+    cfOrgs = spawnSync("cf", ["o"]).stdout.toString().split("\n");
   } finally {
     orgFinderProgress.stop();
   }
@@ -64,14 +61,14 @@ async function selectSpace(cfSpaces: string[]) {
       type: "select",
       name: "selection",
       message: "Choose space",
-      choices: cfSpaces
+      choices: cfSpaces,
     })
   ).selection;
 
-  const spaceProgress = new clui.Spinner("Switching space, please wait...");
-  spaceProgress.start();
+  // const spaceProgress = new clui.Spinner("Switching space, please wait...");
+  const spaceProgress = ora("Switching space, please wait...").start();
   try {
-    await exec('cf target -s "' + cfSpace + '"');
+    spawnSync("cf", ["target", "-s", cfSpace]);
   } finally {
     spaceProgress.stop();
   }
@@ -89,14 +86,14 @@ async function selectOrg(cfOrgs: string[]) {
       type: "select",
       name: "selection",
       message: "Choose organisation",
-      choices: cfOrgs
+      choices: cfOrgs,
     })
   ).selection;
 
-  const orgProgress = new clui.Spinner("Switching organisation, please wait...");
-  orgProgress.start();
+  // const orgProgress = new clui.Spinner("Switching organisation, please wait...");
+  const orgProgress = ora("Switching organisation, please wait...").start();
   try {
-    await exec('cf target -o "' + cfOrg + '"');
+    spawnSync("cf", ["target", "-o", cfOrg]);
   } finally {
     orgProgress.stop();
   }

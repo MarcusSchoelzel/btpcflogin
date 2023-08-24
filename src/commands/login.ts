@@ -2,12 +2,11 @@ import Enquirer from "enquirer";
 import clear from "clear";
 import chalk from "chalk";
 import figlet from "figlet";
-import clui from "clui";
+import ora from "ora";
 import { spawnSync } from "child_process";
 
 import { setCfTarget } from "../util/target-selection.js";
 import { chooseCfApiRegion } from "../util/region.js";
-import { exec } from "../util/helper.js";
 import { isStdError } from "../util/error.js";
 import { DEFAULT_IDP, SSO_LOGIN_KEY, cliConfigStore } from "../util/config-store.js";
 
@@ -26,7 +25,7 @@ export async function cfLogin() {
         type: "select",
         name: "selection",
         message: "Choose login user",
-        choices: [{ name: SSO_LOGIN_KEY, hint: "Single Sign On with Temporary code" }, ...cliConfigStore.getLogins()]
+        choices: [{ name: SSO_LOGIN_KEY, hint: "Single Sign On with Temporary code" }, ...cliConfigStore.getLogins()],
       })
     ).selection;
 
@@ -46,7 +45,7 @@ async function loginWithSso(apiRegionDomain: string) {
   const { ssoCode } = await Enquirer.prompt<{ ssoCode: string }>({
     type: "password",
     name: "ssoCode",
-    message: `Temporary Authentication Code for SSO ( Get one at https://login.cf.${apiRegionDomain}/passcode ):`
+    message: `Temporary Authentication Code for SSO ( Get one at https://login.cf.${apiRegionDomain}/passcode ):`,
   });
 
   // spawnSync has to be used as 'exec' does not work properly here.
@@ -58,7 +57,7 @@ async function loginWithSso(apiRegionDomain: string) {
 
 async function loginWithStoredCreds(passEntry: string) {
   const passShowResult = spawnSync("pass", ["show", passEntry], {
-    stdio: ["inherit", "pipe", "pipe"]
+    stdio: ["inherit", "pipe", "pipe"],
   });
   const showResultError = passShowResult.stderr.toString();
   if (showResultError) {
@@ -68,10 +67,17 @@ async function loginWithStoredCreds(passEntry: string) {
 
   const originOption = await selectOrigin();
 
-  const authProgress = new clui.Spinner("Authenticating you, please wait...");
-  authProgress.start();
+  const authProgress = ora("Authenticating you, please wait...").start();
+
   try {
-    await exec(`cf auth "${btpCredentials[1].slice(10)}" "${btpCredentials[0].replace(/"/g, `\\$&`)}" ${originOption}`);
+    // cf auth "username" "password" [--origin idp-origin]
+    const error = spawnSync("cf", [
+      "auth",
+      btpCredentials[1].slice(10),
+      btpCredentials[0].replace(/"/g, `\\$&`),
+      ...(originOption || []),
+    ]).stderr?.toString();
+    if (error) throw error;
   } catch (error) {
     if (isStdError(error) && JSON.parse(error.stderr).error === "invalid_grant") {
       throw JSON.parse(error.stderr).error_description;
@@ -86,7 +92,7 @@ async function loginWithStoredCreds(passEntry: string) {
 async function selectOrigin() {
   const origins = cliConfigStore.getOrigins();
   if (origins.length === 0) {
-    return "";
+    return;
   }
 
   const chosenOrigin = (
@@ -94,9 +100,9 @@ async function selectOrigin() {
       type: "select",
       name: "selection",
       message: "Choose Identity Provider for Login",
-      choices: [DEFAULT_IDP, ...origins]
+      choices: [DEFAULT_IDP, ...origins],
     })
   ).selection;
 
-  return chosenOrigin === DEFAULT_IDP ? "" : `--origin ${chosenOrigin}`;
+  return chosenOrigin !== DEFAULT_IDP ? ["--origin", chosenOrigin] : undefined;
 }

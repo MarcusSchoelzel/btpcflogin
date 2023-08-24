@@ -17,16 +17,14 @@
     "btpcflogin": "./lib/index.js"
   },
   "scripts": {
-    "build": "npm run clean && tsc",
-    "postbuild": "npm run copy-files",
-    "clean": "rimraf lib/",
-    "copy-files": "copyfiles -u 1 src/**/*.json lib",
-    "local": "npm run build && node lib/index.js"
+    "prepare": "tsc",
+    "local": "ts-node --esm ./src/index.ts",
+    "format": "prettier -w ./src"
   },
   "dependencies": {
     "chalk": "^5.3.0",
     "clear": "^0.1.0",
-    "clui": "^0.3.6",
+    "ora": "7.0.1",
     "commander": "^11.0.0",
     "configstore": "^6.0.0",
     "enquirer": "^2.4.0",
@@ -41,11 +39,10 @@
     "@types/node": "^20.4.5",
     "copyfiles": "^2.4.1",
     "prettier": "^3.0.0",
-    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "prettier": {
-    "trailingComma": "none",
     "printWidth": 120
   },
   "os": [

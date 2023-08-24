@@ -12,8 +12,8 @@ import { addOrigin } from "./commands/add-origin.js";
 
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(getDirname(import.meta.url), "..", "package.json"), {
-    encoding: "utf-8"
-  })
+    encoding: "utf-8",
+  }),
 ) as { name: string; version: string; description: string };
 
 const program = new Command();

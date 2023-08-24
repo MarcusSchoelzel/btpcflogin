@@ -90,7 +90,6 @@ async function selectOrg(cfOrgs: string[]) {
     })
   ).selection;
 
-  // const orgProgress = new clui.Spinner("Switching organisation, please wait...");
   const orgProgress = ora("Switching organisation, please wait...").start();
   try {
     spawnSync("cf", ["target", "-o", cfOrg]);

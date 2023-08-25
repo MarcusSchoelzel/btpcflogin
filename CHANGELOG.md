@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2023-08-25
+
+### Added
+
+- New Command `add-login` to add pass entry to config store
+- New Command `t` to switch current cf target (org,space)
+- New Option to allow for single sign on
+- Possibility to login with custom IDP
+- Origin of custom IDP can be added to pass login entry
+
+### Changed
+
+- Replaced spinner lib `clui` with `ora`
+- `spawnSync` is used for all shell interactions
+- Code refactoring
+
 ## [1.0.6] - 2023-07-27
 
 ### Added

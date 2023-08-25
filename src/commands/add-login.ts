@@ -2,7 +2,7 @@ import Enquirer from "enquirer";
 import { spawnSync } from "child_process";
 import fs from "fs";
 import chalk from "chalk";
-import { cliConfigStore } from "../util/config-store.js";
+import { ConfigStoreProxy } from "../util/config-store.js";
 
 type DirTreeFile = {
   type: "file" | "directory" | "report";
@@ -30,14 +30,14 @@ export async function addLogin() {
       } else {
         const chosenLogin = (
           await Enquirer.prompt<{ selection: string }>({
-            type: "select",
+            type: "autocomplete",
             name: "selection",
             message: "Select 'pass' login",
             choices: possibleLogins,
           })
         ).selection;
 
-        cliConfigStore.addLogin(chosenLogin);
+        new ConfigStoreProxy().addLogin(chosenLogin);
       }
     } else {
       throw new Error("Password store not found");

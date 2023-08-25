@@ -2,15 +2,13 @@ import Configstore from "configstore";
 
 const STORE_NAME = "btpcflogin";
 const PASS_LOGINS_STORE_KEY = "passLogins";
-const ORIGINS_STORE_MEMBER = "origins";
 
 export const DEFAULT_IDP = "Default IdP";
 export const SSO_LOGIN_KEY = "single-sign-on";
 
 type Logins = string[];
-type Origins = string[];
 
-class ConfigStoreProxy {
+export class ConfigStoreProxy {
   private config: Configstore;
   constructor() {
     this.config = new Configstore(STORE_NAME);
@@ -26,14 +24,6 @@ class ConfigStoreProxy {
     return storedLogins;
   }
 
-  getOrigins(): Origins {
-    const storedOrigins = this.config.get(ORIGINS_STORE_MEMBER) ?? [];
-
-    this.assertsStoreValueIsArray(storedOrigins, ORIGINS_STORE_MEMBER);
-
-    return storedOrigins;
-  }
-
   /**
    * Adds new login to cli configstore
    */
@@ -47,23 +37,9 @@ class ConfigStoreProxy {
     this.config.set(PASS_LOGINS_STORE_KEY, [...existingLogins, loginId]);
   }
 
-  /**
-   * Adds new origin of custom Identity Provider to store
-   */
-  addOrigin(origin: string) {
-    const existingOrigins = this.getOrigins();
-
-    if (existingOrigins.includes(origin)) {
-      throw new Error(`Origin '${origin}' is already included in config store!`);
-    }
-    this.config.set(ORIGINS_STORE_MEMBER, [...existingOrigins, origin]);
-  }
-
   private assertsStoreValueIsArray(storedProperty: any, propertyKey: string): asserts storedProperty is string[] {
     if (storedProperty !== undefined && !Array.isArray(storedProperty)) {
       throw new Error(`Property ${propertyKey} in configuration file is not of type Array. Please define an Array []!`);
     }
   }
 }
-
-export const cliConfigStore = new ConfigStoreProxy();

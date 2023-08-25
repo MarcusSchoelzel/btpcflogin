@@ -37,9 +37,6 @@ Install as shell command from source:
 - `add-login`  
   Interactively adds new `pass` login to the config store.
 
-- `add-origin`  
-  Adds new origin of a custom identity provider to config store. If at least one origin is maintained, it will queried after the login password has been chosen
-
 - `t` (target)  
   Interactive setting of new target (org and space), by using the current API region and logon token. (see `cf t`)
 
@@ -86,7 +83,10 @@ It is assumed that the login data is stored in the following format in a pass fi
 ``` pass
 <password of SAP S-user>
 username: <e-mail of SAP S-user>
+origin: <origin or custom IdP>
 ```
+
+**Hint**: The origin is only required if the credentials are from a custom identity provider.
 
 To read the username the first 10 characters of the second line are ignored.
 

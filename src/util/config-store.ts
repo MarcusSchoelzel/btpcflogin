@@ -37,6 +37,21 @@ export class ConfigStoreProxy {
     this.config.set(PASS_LOGINS_STORE_KEY, [...existingLogins, loginId]);
   }
 
+  /**
+   * Removes pass login from cli configstore
+   */
+  removeLogin(loginId: string) {
+    const existingLogins = this.getLogins();
+
+    const indexToRm = existingLogins.indexOf(loginId);
+    if (indexToRm >= 0) {
+      existingLogins.splice(indexToRm, 1);
+      this.config.set(PASS_LOGINS_STORE_KEY, existingLogins);
+    } else {
+      throw new Error(`Pass Login "${loginId}" not found in Config store`);
+    }
+  }
+
   private assertsStoreValueIsArray(storedProperty: any, propertyKey: string): asserts storedProperty is string[] {
     if (storedProperty !== undefined && !Array.isArray(storedProperty)) {
       throw new Error(`Property ${propertyKey} in configuration file is not of type Array. Please define an Array []!`);

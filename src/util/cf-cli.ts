@@ -41,9 +41,10 @@ export class CloudFoundryCli {
     }
   }
   async setTarget() {
-    if (await this.setOrg()) {
-      await this.setSpace();
-    }
+    await this.setOrg();
+    await this.setSpace();
+    // print current cf target
+    console.log(chalk.cyanBright(this.getCurrentTarget()));
   }
   async setSpace() {
     let cfSpaces = spawnSync("cf", ["spaces"]).stdout?.toString().split("\n");
@@ -64,9 +65,6 @@ export class CloudFoundryCli {
       await this.selectOrg(cfOrgs);
       return true;
     }
-  }
-  getCurrentTarget() {
-    return spawnSync("cf", ["t"]).stdout.toString();
   }
 
   /**
@@ -93,6 +91,10 @@ export class CloudFoundryCli {
     apiProgress.stop();
 
     return { apiRegionCode, apiRegionDomain };
+  }
+
+  private getCurrentTarget() {
+    return spawnSync("cf", ["t"]).stdout.toString();
   }
 
   /**

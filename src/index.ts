@@ -9,7 +9,7 @@ import { LoginFlow } from "./commands/login.js";
 import { addLogin } from "./commands/add-login.js";
 import { setCfTarget } from "./commands/set-target.js";
 import { removeLogin } from "./commands/remove-login.js";
-import { sortLogin } from "./commands/sort-logins.js";
+import { sortLogins } from "./commands/sort-logins.js";
 
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(getDirname(import.meta.url), "..", "package.json"), {
@@ -43,6 +43,6 @@ program
 program
   .command("sort-logins")
   .description("Sort the stored 'pass' Logins in the configstore")
-  .action(() => sortLogin());
+  .action(() => sortLogins());
 
 program.parse();

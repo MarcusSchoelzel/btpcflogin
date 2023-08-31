@@ -5,7 +5,7 @@ import chalk from "chalk";
 /**
  * Sorts the available pass logins in the configstore
  */
-export async function sortLogin() {
+export async function sortLogins() {
   const configStore = new ConfigStoreProxy();
 
   try {

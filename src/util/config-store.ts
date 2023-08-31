@@ -25,6 +25,13 @@ export class ConfigStoreProxy {
   }
 
   /**
+   * Writes the given logins array into configstore
+   */
+  setLogins(logins: string[]) {
+    this.config.set(PASS_LOGINS_STORE_KEY, logins);
+  }
+
+  /**
    * Adds new login to cli configstore
    */
   addLogin(loginId: string) {

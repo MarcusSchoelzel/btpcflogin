@@ -7,7 +7,7 @@ import { CloudFoundryCli } from "../util/cf-cli.js";
  */
 export async function setCfTarget() {
   try {
-    new CloudFoundryCli().setTarget();
+    await new CloudFoundryCli().setTarget();
   } catch (error) {
     console.error(chalk.redBright(error));
   }

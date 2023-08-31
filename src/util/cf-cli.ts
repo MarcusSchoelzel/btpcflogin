@@ -56,14 +56,20 @@ export class CloudFoundryCli {
   }
   async setSpace() {
     const cfSpaces = this.getSpaces();
-    if (!cfSpaces?.length) return false;
+    if (!cfSpaces?.length) {
+      console.log(chalk.yellowBright(NO_SPACES_FOUND));
+      return false;
+    }
 
     await this.selectSpace(cfSpaces);
     return true;
   }
   async setOrg() {
     const orgs = this.getOrgs();
-    if (!orgs?.length) return false;
+    if (!orgs?.length) {
+      console.log(chalk.yellowBright(NO_ORGS_FOUND));
+      return false;
+    }
 
     await this.selectOrg(orgs);
     return true;
@@ -95,7 +101,7 @@ export class CloudFoundryCli {
   private getSpaces() {
     const spaceFinderProgress = ora("Selecting spaces, please wait...").start();
 
-    let cfSpaces = [];
+    let cfSpaces: string[];
 
     try {
       const spaceResult = spawnSync("cf", ["spaces"]);
@@ -103,11 +109,10 @@ export class CloudFoundryCli {
 
       cfSpaces = spaceResult.stdout.toString().split("\n");
       if (cfSpaces[2] === NO_SPACES_FOUND) {
-        console.log(chalk.yellowBright(NO_SPACES_FOUND));
-        return [];
+        cfSpaces = [];
+      } else {
+        cfSpaces = cfSpaces.splice(3, cfSpaces.length - 4);
       }
-
-      cfSpaces = cfSpaces.splice(3, cfSpaces.length - 4);
     } finally {
       spaceFinderProgress.stop();
     }
@@ -130,11 +135,10 @@ export class CloudFoundryCli {
       cfOrgs = getOrgsResult.stdout.toString().split("\n");
 
       if (cfOrgs[2] === NO_ORGS_FOUND) {
-        console.log(chalk.yellowBright(NO_ORGS_FOUND));
-        return [];
+        cfOrgs = [];
+      } else {
+        cfOrgs = cfOrgs.splice(3, cfOrgs.length - 4);
       }
-
-      cfOrgs = cfOrgs.splice(3, cfOrgs.length - 4);
     } finally {
       orgFinderProgress.stop();
     }

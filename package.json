@@ -26,7 +26,7 @@
     "clear": "^0.1.0",
     "commander": "^11.0.0",
     "configstore": "^6.0.0",
-    "enquirer": "^2.4.0",
+    "enquirer": "^2.4.1",
     "figlet": "^1.6.0",
     "ora": "7.0.1"
   },

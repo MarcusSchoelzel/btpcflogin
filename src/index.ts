@@ -8,6 +8,8 @@ import { getDirname } from "./util/helper.js";
 import { LoginFlow } from "./commands/login.js";
 import { addLogin } from "./commands/add-login.js";
 import { setCfTarget } from "./commands/set-target.js";
+import { removeLogin } from "./commands/remove-login.js";
+import { sortLogin } from "./commands/sort-logins.js";
 
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(getDirname(import.meta.url), "..", "package.json"), {
@@ -32,5 +34,15 @@ program
   .command("add-login")
   .description("Adds new 'pass' Login Id to configstore")
   .action(() => addLogin());
+
+program
+  .command("rm-login")
+  .description("Removes 'pass' Login from configstore")
+  .action(() => removeLogin());
+
+program
+  .command("sort-logins")
+  .description("Sort the stored 'pass' Logins in the configstore")
+  .action(() => sortLogin());
 
 program.parse();

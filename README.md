@@ -35,7 +35,13 @@ Install as shell command from source:
   Starts complete Login to Cloud Foundry. As this is the default command it can be ommitted and is triggered by executing `btpcflogin`.
 
 - `add-login`  
-  Interactively adds new `pass` login to the config store.
+  Interactively adds new `pass` login to the config store
+
+- `rm-login`  
+  Interactively removes `pass` login from the config store
+
+- `sort-logins`  
+  Allows reordering of the stored `pass` logins in the config store
 
 - `t` (target)  
   Interactive setting of new target (org and space), by using the current API region and logon token. (see `cf t`)

@@ -37,14 +37,29 @@ export class LoginFlow {
   }
 
   private async getLoginKey() {
+    const storedLogins = new ConfigStoreProxy().getLogins();
+
     return (
       await Enquirer.prompt<{ selection: string }>({
         type: "autocomplete",
         name: "selection",
         message: "Choose login user",
+        initial: storedLogins.length ? 1 : 0,
         choices: [
-          { name: SSO_LOGIN_KEY, hint: "Single Sign On with Temporary code" },
-          ...new ConfigStoreProxy().getLogins(),
+          {
+            name: SSO_LOGIN_KEY,
+            hint: "Single Sign On with Temporary code",
+          },
+          // separator sso from stored pass logins
+          ...(storedLogins.length
+            ? [
+                {
+                  name: "sep1",
+                  role: "separator",
+                },
+              ]
+            : []),
+          ...storedLogins,
         ],
       })
     ).selection;

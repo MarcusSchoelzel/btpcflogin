@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2023-09-01
+
+### Added
+
+- New Command `sort-logins` to reorder the logins in the config store
+- New Command `remove-login` to delete pass login from the config store
+
+### Changed
+
+- First pass login is marked per default during login process
+- Command `add-login` only shows pass logins that are missing from the config store
+- Improved error handling
+
 ## [1.1.0] - 2023-08-25
 
 ### Added

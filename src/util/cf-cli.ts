@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { spawnSync } from "child_process";
+import { SpawnSyncReturns, spawnSync } from "child_process";
 import Enquirer from "enquirer";
 import ora from "ora";
 import path from "path";
@@ -7,8 +7,23 @@ import fs from "fs";
 
 import { getDirname } from "./helper.js";
 
-function isStdError(error: any): error is { stderr: string } {
-  return !!error.stderr;
+const NO_SPACES_FOUND = "No spaces found.";
+const NO_ORGS_FOUND = "No orgs found.";
+const SHELL_CANCELLED = "Process terminated!";
+
+function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
+  if (spawnResult.signal === "SIGINT") throw new Error(SHELL_CANCELLED);
+
+  const error = spawnResult.stderr.toString();
+  if (error) {
+    let customErrorText = "";
+    try {
+      customErrorText = (JSON.parse(error) as { error_description: string }).error_description;
+    } catch (parseError) {}
+
+    if (customErrorText) throw new Error(customErrorText);
+    throw new Error(error);
+  }
 }
 
 export class CloudFoundryCli {
@@ -16,55 +31,48 @@ export class CloudFoundryCli {
     const authProgress = ora("Authenticating you, please wait...").start();
     try {
       // cf auth username "password" [--origin idp-origin]
-      const error = spawnSync(
+      const cfAuthReturn = spawnSync(
         "cf",
         ["auth", user, `"${password.replace(/"/g, `\\$&`)}"`, ...(origin ? ["--origin", origin] : [])],
         // shell: true is required, otherwise quotes will be stripped from password
         { shell: true },
-      ).stderr?.toString();
-      if (error) throw error;
-    } catch (error) {
-      if (isStdError(error) && JSON.parse(error.stderr).error === "invalid_grant") {
-        throw JSON.parse(error.stderr).error_description;
-      } else {
-        throw error;
-      }
+      );
+
+      checkSpawnErrors(cfAuthReturn);
     } finally {
       authProgress.stop();
     }
     authProgress.stop();
   }
   async loginWithSso(ssoCode: string) {
-    const loginError = spawnSync("cf", ["l", "--sso-passcode", ssoCode]).stderr.toString();
-    if (loginError) {
-      throw loginError;
-    }
+    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", ssoCode]));
   }
   async setTarget() {
-    await this.setOrg();
-    await this.setSpace();
+    if (!(await this.setOrg())) return;
+    if (!(await this.setSpace())) return;
+
     // print current cf target
     console.log(chalk.cyanBright(this.getCurrentTarget()));
   }
   async setSpace() {
-    let cfSpaces = spawnSync("cf", ["spaces"]).stdout?.toString().split("\n");
-    if (cfSpaces[2] === "No spaces found.") {
-      console.log(chalk.yellowBright(cfSpaces[2]));
-    } else {
-      cfSpaces = cfSpaces.splice(3, cfSpaces.length - 4);
-      await this.selectSpace(cfSpaces);
+    const cfSpaces = this.getSpaces();
+    if (!cfSpaces?.length) {
+      console.log(chalk.yellowBright(NO_SPACES_FOUND));
+      return false;
     }
+
+    await this.selectSpace(cfSpaces);
+    return true;
   }
   async setOrg() {
-    let cfOrgs = await this.getOrgs();
-    if (cfOrgs[2] === "No orgs found.") {
-      console.log(chalk.yellowBright(cfOrgs[2]));
+    const orgs = this.getOrgs();
+    if (!orgs?.length) {
+      console.log(chalk.yellowBright(NO_ORGS_FOUND));
       return false;
-    } else {
-      cfOrgs = cfOrgs.splice(3, cfOrgs.length - 4);
-      await this.selectOrg(cfOrgs);
-      return true;
     }
+
+    await this.selectOrg(orgs);
+    return true;
   }
 
   /**
@@ -77,14 +85,7 @@ export class CloudFoundryCli {
     const apiProgress = ora("Switching region, please wait...").start();
 
     try {
-      const error = spawnSync("cf", ["api", `api.cf.${apiRegionDomain}`]).stderr?.toString();
-      if (error) throw error;
-    } catch (error) {
-      if (isStdError(error)) {
-        throw error.stderr;
-      } else {
-        throw error;
-      }
+      checkSpawnErrors(spawnSync("cf", ["api", `api.cf.${apiRegionDomain}`]));
     } finally {
       apiProgress.stop();
     }
@@ -97,15 +98,47 @@ export class CloudFoundryCli {
     return spawnSync("cf", ["t"]).stdout.toString();
   }
 
+  private getSpaces() {
+    const spaceFinderProgress = ora("Selecting spaces, please wait...").start();
+
+    let cfSpaces: string[];
+
+    try {
+      const spaceResult = spawnSync("cf", ["spaces"]);
+      checkSpawnErrors(spaceResult);
+
+      cfSpaces = spaceResult.stdout.toString().split("\n");
+      if (cfSpaces[2] === NO_SPACES_FOUND) {
+        cfSpaces = [];
+      } else {
+        cfSpaces = cfSpaces.splice(3, cfSpaces.length - 4);
+      }
+    } finally {
+      spaceFinderProgress.stop();
+    }
+    spaceFinderProgress.stop();
+
+    return cfSpaces;
+  }
+
   /**
    * Retrieves list of organisation of current region
    */
-  private async getOrgs() {
+  private getOrgs() {
     const orgFinderProgress = ora("Selecting orgs, please wait...").start();
 
     let cfOrgs: string[];
     try {
-      cfOrgs = spawnSync("cf", ["o"]).stdout.toString().split("\n");
+      const getOrgsResult = spawnSync("cf", ["o"]);
+      checkSpawnErrors(getOrgsResult);
+
+      cfOrgs = getOrgsResult.stdout.toString().split("\n");
+
+      if (cfOrgs[2] === NO_ORGS_FOUND) {
+        cfOrgs = [];
+      } else {
+        cfOrgs = cfOrgs.splice(3, cfOrgs.length - 4);
+      }
     } finally {
       orgFinderProgress.stop();
     }

@@ -15,33 +15,40 @@ export async function addLogin() {
     // Logic to determine default password-store directory taken from manual of 'pass'
     const storeDirectory = process.env.PASSWORD_STORE_DIR ?? `${process.env.HOME}/.password-store`;
 
-    if (fs.existsSync(storeDirectory)) {
-      // uses 'tree' util to retrieve directory contents as JSON string
-      const passwordStoreTreeJson = spawnSync("tree", ["-J", storeDirectory], {
-        stdio: ["inherit", "pipe", "pipe"],
-      }).stdout.toString();
-      const passwordStoreTree = JSON.parse(passwordStoreTreeJson) as DirTreeFile[];
-      const possibleLogins: string[] = [];
+    if (!fs.existsSync(storeDirectory)) throw new Error("Password store not found");
 
-      collectPasswords(passwordStoreTree[0]?.contents ?? [], possibleLogins);
+    // uses 'tree' util to retrieve directory contents as JSON string
+    const passwordStoreTreeJson = spawnSync("tree", ["-J", storeDirectory], {
+      stdio: ["inherit", "pipe", "pipe"],
+    }).stdout.toString();
+    const passwordStoreTree = JSON.parse(passwordStoreTreeJson) as DirTreeFile[];
+    let possibleLogins: string[] = [];
 
-      if (possibleLogins.length === 0) {
-        console.error(chalk.yellowBright("No Logins in Password Store"));
-      } else {
-        const chosenLogin = (
-          await Enquirer.prompt<{ selection: string }>({
-            type: "autocomplete",
-            name: "selection",
-            message: "Select 'pass' login",
-            choices: possibleLogins,
-          })
-        ).selection;
+    collectPasswords(passwordStoreTree[0]?.contents ?? [], possibleLogins);
 
-        new ConfigStoreProxy().addLogin(chosenLogin);
-      }
-    } else {
-      throw new Error("Password store not found");
+    if (possibleLogins.length === 0) {
+      console.error(chalk.yellowBright("No Logins in Password Store"));
+      return;
     }
+
+    const configStore = new ConfigStoreProxy();
+    // keep only logins that are not already in the store
+    possibleLogins = possibleLogins.filter((login) => configStore.getLogins().indexOf(login) === -1);
+    if (possibleLogins.length === 0) {
+      console.error(chalk.yellowBright("All Pass Logins already added to configstore!"));
+      return;
+    }
+
+    const chosenLogin = (
+      await Enquirer.prompt<{ selection: string }>({
+        type: "autocomplete",
+        name: "selection",
+        message: "Select 'pass' login",
+        choices: possibleLogins,
+      })
+    ).selection;
+
+    configStore.addLogin(chosenLogin);
   } catch (error) {
     console.error(chalk.redBright(error));
   }

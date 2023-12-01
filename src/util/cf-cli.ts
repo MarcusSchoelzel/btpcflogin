@@ -33,7 +33,13 @@ export class CloudFoundryCli {
       // cf auth username "password" [--origin idp-origin]
       const cfAuthReturn = spawnSync(
         "cf",
-        ["auth", user, `"${password.replace(/"/g, `\\$&`)}"`, ...(origin ? ["--origin", origin] : [])],
+        [
+          "auth",
+          user,
+          // Escapes '"' and '$' characters
+          `"${password.replace(/("|\$)/g, `\\$&`)}"`,
+          ...(origin ? ["--origin", origin] : []),
+        ],
         // shell: true is required, otherwise quotes will be stripped from password
         { shell: true },
       );

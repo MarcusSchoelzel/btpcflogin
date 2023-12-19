@@ -75,7 +75,7 @@ export class LoginFlow {
   }
 
   private async loginWithStoredCreds(passEntry: string) {
-    const passShowResult = spawnSync("pass", ["show", passEntry], {
+    const passShowResult = spawnSync(process.platform === "linux" ? "pass" : "gopass", ["show", passEntry], {
       stdio: ["inherit", "pipe", "pipe"],
     });
     const showResultError = passShowResult.stderr.toString();

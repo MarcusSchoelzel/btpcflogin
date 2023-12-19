@@ -44,7 +44,8 @@
     "printWidth": 120
   },
   "os": [
-    "linux"
+    "linux",
+    "win32"
   ],
   "keywords": [
     "btp",

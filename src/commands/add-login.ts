@@ -7,7 +7,7 @@ import path from "path";
 export async function addLogin() {
   try {
     const storeDirectory = process.platform === "linux" ? getPassStorePath() : getGoPassStorePath();
-    if (!fs.existsSync(storeDirectory)) throw new Error("Password store not found");
+    if (!fs.existsSync(storeDirectory)) throw new Error(`Password store not found at ${storeDirectory}`);
     let possibleLogins = readPasswordStoreLogins(storeDirectory);
 
     if (possibleLogins.length === 0) {

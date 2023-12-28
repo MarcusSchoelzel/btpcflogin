@@ -32,13 +32,14 @@ export class CloudFoundryCli {
 
     try {
       // cf auth username "password" [--origin idp-origin]
-      if (/^win/.test(process.platform)) {
-        // cmd shell seems to be easier to handle in terms of escaping meta characters
+      if (process.platform === "win32") {
         checkSpawnErrors(
           spawnSync(
             "cf",
+            // Escapes '"' character
             ["auth", user, `"${password.replace(/"/g, `"$&`)}"`, ...(origin ? ["--origin", origin] : [])],
             {
+              // cmd shell seems to be easier to handle in terms of escaping meta characters
               shell: "cmd.exe",
             },
           ),
@@ -54,7 +55,7 @@ export class CloudFoundryCli {
               `"${password.replace(/("|\$)/g, `\\$&`)}"`,
               ...(origin ? ["--origin", origin] : []),
             ],
-            // shell: true is required, otherwise quotes will be stripped from password
+            // shell=true is required, otherwise quotes will be stripped from password
             { shell: true },
           ),
         );

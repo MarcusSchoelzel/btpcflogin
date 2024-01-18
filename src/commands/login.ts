@@ -6,6 +6,7 @@ import { spawnSync } from "child_process";
 
 import { SSO_LOGIN_KEY, ConfigStoreProxy } from "../util/config-store.js";
 import { CloudFoundryCli } from "../util/cf-cli.js";
+import { assertCmdInPath } from "../util/helper.js";
 
 export class LoginFlow {
   private cfCli: CloudFoundryCli;
@@ -14,6 +15,8 @@ export class LoginFlow {
   }
   async run() {
     try {
+      await assertCmdInPath("cf");
+
       clear();
       this.printIntro();
 
@@ -75,7 +78,11 @@ export class LoginFlow {
   }
 
   private async loginWithStoredCreds(passEntry: string) {
-    const passShowResult = spawnSync("pass", ["show", passEntry], {
+    const passExecName = process.platform === "linux" ? "pass" : "gopass";
+
+    await assertCmdInPath(passExecName);
+
+    const passShowResult = spawnSync(passExecName, ["show", passEntry], {
       stdio: ["inherit", "pipe", "pipe"],
     });
     const showResultError = passShowResult.stderr.toString();

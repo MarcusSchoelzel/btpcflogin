@@ -35,13 +35,13 @@ Install as shell command from source:
   Starts complete Login to Cloud Foundry. As this is the default command it can be ommitted and is triggered by executing `btpcflogin`.
 
 - `add-login`  
-  Interactively adds new `pass` login to the config store
+  Interactively adds new `pass`/`gopass` login to the config store
 
 - `rm-login`  
-  Interactively removes `pass` login from the config store
+  Interactively removes `pass`/`gopass` login from the config store
 
 - `sort-logins`  
-  Allows reordering of the stored `pass` logins in the config store
+  Allows reordering of the stored `pass`/`gopass` logins in the config store
 
 - `t` (target)  
   Interactive setting of new target (org and space), by using the current API region and logon token. (see `cf t`)
@@ -65,24 +65,16 @@ btpcflogin add-login
 
 A [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installation to clone the repo.
 
-This project uses `pass` as credential store.
-To use this login helper you have to [install and setup](https://www.passwordstore.org/) pass in your Linux environment.
+### Credential manager installation
 
-You have to tell the helper which pass entries should be used for login.
-To do so, you have to create a config file named `btpcflogin.json` in `~/.config/configstore/` with the following structure.
-You can specify more than one login inside the array [].
-You have to specify the full relative path to the file (as printed by `pass show`).
+To use login credentials besides the SSO option that is provided by the Cloud Foundry CLI, a credential manager needs to be installed.
 
-``` json
-{
-    "passLogins": [
-        "S0123456789",
-        "/my-company/cloud/S0123456789"
-    ]
-}
-```
+| Platform | Manager                                                                                                               |
+| -------- | --------------------------------------------------------------------------------------------------------------------- |
+| Linux    | `pass` - the standard linux password manager ([install and setup](https://www.passwordstore.org/))                    |
+| Windows  | `gopass` - cross-platform password manager that is compatible to `pass` ([install and setup](https://www.gopass.pw/)) |
 
-**HINT**: use the command `btpcflogin add-login` to prevent entering a false pass login to the file
+## Credential format
 
 It is assumed that the login data is stored in the following format in a pass file:
 

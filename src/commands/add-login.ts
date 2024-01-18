@@ -1,30 +1,14 @@
 import Enquirer from "enquirer";
-import { spawnSync } from "child_process";
 import fs from "fs";
 import chalk from "chalk";
 import { ConfigStoreProxy } from "../util/config-store.js";
-
-type DirTreeFile = {
-  type: "file" | "directory" | "report";
-  name: string;
-  contents?: DirTreeFile[];
-};
+import path from "path";
 
 export async function addLogin() {
   try {
-    // Logic to determine default password-store directory taken from manual of 'pass'
-    const storeDirectory = process.env.PASSWORD_STORE_DIR ?? `${process.env.HOME}/.password-store`;
-
-    if (!fs.existsSync(storeDirectory)) throw new Error("Password store not found");
-
-    // uses 'tree' util to retrieve directory contents as JSON string
-    const passwordStoreTreeJson = spawnSync("tree", ["-J", storeDirectory], {
-      stdio: ["inherit", "pipe", "pipe"],
-    }).stdout.toString();
-    const passwordStoreTree = JSON.parse(passwordStoreTreeJson) as DirTreeFile[];
-    let possibleLogins: string[] = [];
-
-    collectPasswords(passwordStoreTree[0]?.contents ?? [], possibleLogins);
+    const storeDirectory = process.platform === "linux" ? getPassStorePath() : getGoPassStorePath();
+    if (!fs.existsSync(storeDirectory)) throw new Error(`Password store not found at ${storeDirectory}`);
+    let possibleLogins = readPasswordStoreLogins(storeDirectory);
 
     if (possibleLogins.length === 0) {
       console.error(chalk.yellowBright("No Logins in Password Store"));
@@ -54,13 +38,18 @@ export async function addLogin() {
   }
 }
 
-function collectPasswords(dirContents: DirTreeFile[], possibleLogins: string[], pwPrefix = "") {
-  for (let file of dirContents) {
-    if (file.type === "directory") {
-      collectPasswords(file.contents ?? [], possibleLogins, `${pwPrefix}${file.name}/`);
-    } else if (file.type === "file" && file.name.endsWith(".gpg")) {
-      const loginFileName = file.name.split(".")[0];
-      possibleLogins.push(`${pwPrefix}${loginFileName}`);
-    }
-  }
+function readPasswordStoreLogins(path: string): string[] {
+  return (
+    (fs.readdirSync(path, { recursive: true }) as string[])
+      .filter((f) => f.endsWith(".gpg"))
+      .map((f) => f.split(".")[0].replace(/\\/g, "/")) ?? []
+  );
+}
+
+function getPassStorePath() {
+  return process.env.PASSWORD_STORE_DIR ?? `${process.env.HOME}/.password-store`;
+}
+
+function getGoPassStorePath() {
+  return path.join(process.env.LOCALAPPDATA as string, "gopass", "stores", "root");
 }

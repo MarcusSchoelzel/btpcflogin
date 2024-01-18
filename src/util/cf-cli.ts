@@ -29,22 +29,37 @@ function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
 export class CloudFoundryCli {
   async login(user: string, password: string, origin?: string) {
     const authProgress = ora("Authenticating you, please wait...").start();
+
     try {
       // cf auth username "password" [--origin idp-origin]
-      const cfAuthReturn = spawnSync(
-        "cf",
-        [
-          "auth",
-          user,
-          // Escapes '"' and '$' characters
-          `"${password.replace(/("|\$)/g, `\\$&`)}"`,
-          ...(origin ? ["--origin", origin] : []),
-        ],
-        // shell: true is required, otherwise quotes will be stripped from password
-        { shell: true },
-      );
-
-      checkSpawnErrors(cfAuthReturn);
+      if (process.platform === "win32") {
+        checkSpawnErrors(
+          spawnSync(
+            "cf",
+            // Escapes '"' character
+            ["auth", user, `"${password.replace(/"/g, `"$&`)}"`, ...(origin ? ["--origin", origin] : [])],
+            {
+              // cmd shell seems to be easier to handle in terms of escaping meta characters
+              shell: "cmd.exe",
+            },
+          ),
+        );
+      } else {
+        checkSpawnErrors(
+          spawnSync(
+            "cf",
+            [
+              "auth",
+              user,
+              // Escapes '"' and '$' characters
+              `"${password.replace(/("|\$)/g, `\\$&`)}"`,
+              ...(origin ? ["--origin", origin] : []),
+            ],
+            // shell=true is required, otherwise quotes will be stripped from password
+            { shell: true },
+          ),
+        );
+      }
     } finally {
       authProgress.stop();
     }

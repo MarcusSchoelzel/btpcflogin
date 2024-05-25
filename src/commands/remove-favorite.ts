@@ -19,12 +19,11 @@ export async function removeFavorite() {
       choices: storedFavorites,
     });
 
-    configStore.setFavorites(
-      storedFavorites.splice(
-        storedFavorites.findIndex((f) => f.name === favToRemove),
-        1,
-      ),
+    storedFavorites.splice(
+      storedFavorites.findIndex((f) => f.name === favToRemove),
+      1,
     );
+    configStore.setFavorites(storedFavorites);
   } catch (error) {
     console.error(chalk.redBright(error));
   }

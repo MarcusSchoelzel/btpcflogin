@@ -89,6 +89,7 @@ export class LoginFlow {
     const favorites = new ConfigStoreProxy().getFavorites();
     if (favorites.length === 0) {
       console.log(chalk.yellowBright("No Favorites found. Running guided login..."));
+      this.storeAsFavorite = true;
       return this.loginInteractively();
     }
 
@@ -98,7 +99,7 @@ export class LoginFlow {
       message: "Choose Favorite for SAP BTP CF Login",
       choices: favorites.map((f) => ({
         name: f.name,
-        hint: `Region: ${f.region}, Org: ${f.org}, Space: ${f.space}, Login: ${f.passLogin}`,
+        hint: `Region: ${f.region}, Org: ${f.org}, Space: ${f.space}${f.sso ? `, Login: ${f.passLogin}` : ""}`,
       })),
     });
 

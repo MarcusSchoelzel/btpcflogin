@@ -34,6 +34,14 @@ Install as shell command from source:
 - `login` (default)  
   Starts complete Login to Cloud Foundry. As this is the default command it can be ommitted and is triggered by executing `btpcflogin`.
 
+  Options:
+
+  - `-s, --store-favorite`  
+    Stores the cf target after successful login in the config store
+
+  - `-f, --use-favorite`  
+    Use stored favorite to login event faster
+
 - `add-login`  
   Interactively adds new `pass`/`gopass` login to the config store
 
@@ -46,11 +54,20 @@ Install as shell command from source:
 - `t` (target)  
   Interactive setting of new target (org and space), by using the current API region and logon token. (see `cf t`)
 
+- `sort-favs`  
+  Allows reordering of the stored favorites in the config store
+
+- `rm-fav`  
+  Remove single cf target favorite from the config store
+  
 ### Example calls
 
 ```sh
 # Login
 btpcflogin
+
+# Login and store the chosen org, space, api region and pass login into favorite
+btpcflogin -s
 
 # choose target
 btpcflogin t

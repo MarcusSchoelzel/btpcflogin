@@ -171,14 +171,20 @@ export class CloudFoundryCli {
    * Prompts space selection
    */
   private async selectSpace(cfSpaces: string[]) {
-    const cfSpace = (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "select",
-        name: "selection",
-        message: "Choose space",
-        choices: cfSpaces,
-      })
-    ).selection;
+    let cfSpace: string;
+    if (cfSpaces.length === 1) {
+      cfSpace = cfSpaces[0];
+      console.log(`${chalk.green("✔")} Setting only available Space ${chalk.gray("·")} ${chalk.cyan(cfSpace)}`);
+    } else {
+      cfSpace = (
+        await Enquirer.prompt<{ selection: string }>({
+          type: "select",
+          name: "selection",
+          message: "Choose space",
+          choices: cfSpaces,
+        })
+      ).selection;
+    }
 
     const spaceProgress = ora("Switching space, please wait...").start();
     try {
@@ -193,14 +199,21 @@ export class CloudFoundryCli {
    * Prompts org selection
    */
   private async selectOrg(cfOrgs: string[]) {
-    const cfOrg = (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "select",
-        name: "selection",
-        message: "Choose organisation",
-        choices: cfOrgs,
-      })
-    ).selection;
+    let cfOrg: string;
+
+    if (cfOrgs.length === 1) {
+      cfOrg = cfOrgs[0];
+      console.log(`${chalk.green("✔")} Setting only available org ${chalk.gray("·")} ${chalk.cyan(cfOrg)}`);
+    } else {
+      cfOrg = (
+        await Enquirer.prompt<{ selection: string }>({
+          type: "select",
+          name: "selection",
+          message: "Choose organisation",
+          choices: cfOrgs,
+        })
+      ).selection;
+    }
 
     const orgProgress = ora("Switching organisation, please wait...").start();
     try {

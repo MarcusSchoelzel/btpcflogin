@@ -1,12 +1,26 @@
 import Configstore from "configstore";
+import z from "zod";
 
 const STORE_NAME = "btpcflogin";
 const PASS_LOGINS_STORE_KEY = "passLogins";
+const FAVORITE_TARGETS = "favoriteTargets";
 
 export const DEFAULT_IDP = "Default IdP";
 export const SSO_LOGIN_KEY = "single-sign-on";
 
 type Logins = string[];
+
+const favoriteSchema = z.object({
+  name: z.string(),
+  region: z.string(),
+  org: z.string(),
+  space: z.string(),
+  sso: z.boolean(),
+  passLogin: z.string().optional(),
+});
+const favoritesSchema = favoriteSchema.array().optional();
+
+export type Favorite = z.infer<typeof favoriteSchema>;
 
 export class ConfigStoreProxy {
   private config: Configstore;
@@ -57,6 +71,28 @@ export class ConfigStoreProxy {
     } else {
       throw new Error(`Pass Login "${loginId}" not found in Config store`);
     }
+  }
+
+  getFavorites(): Favorite[] {
+    try {
+      return favoritesSchema.parse(this.config.get(FAVORITE_TARGETS) ?? []) || [];
+    } catch (error) {
+      throw new Error(`Property ${FAVORITE_TARGETS} in configuration is invalid`);
+    }
+  }
+
+  addFavorite(favorite: Favorite) {
+    const favorites = this.getFavorites();
+
+    if (favorites.findIndex((f) => f.name === favorite.name) !== -1) {
+      throw new Error(`A favorite cf target with name '${favorite.name} already exists!`);
+    }
+
+    this.config.set(FAVORITE_TARGETS, [...favorites, favorite]);
+  }
+
+  setFavorites(favorites: Favorite[]) {
+    this.config.set(FAVORITE_TARGETS, favorites);
   }
 
   private assertsStoreValueIsArray(storedProperty: any, propertyKey: string): asserts storedProperty is string[] {

@@ -9,7 +9,7 @@ import { assertCmdInPath } from "../util/helper.js";
 export async function setCfTarget() {
   try {
     await assertCmdInPath("cf");
-    await new CloudFoundryCli().setTarget();
+    await new CloudFoundryCli().setTargetInteractively();
   } catch (error) {
     console.error(chalk.redBright(error));
   }

@@ -7,6 +7,7 @@ import fs from "fs";
 import z from "zod";
 
 import { getDirname } from "./helper.js";
+import { homedir } from "os";
 
 const NO_SPACES_FOUND = "No spaces found.";
 const NO_ORGS_FOUND = "No orgs found.";
@@ -161,7 +162,7 @@ export class CloudFoundryCli {
   }
 
   getCurrentConfig() {
-    const configPath = `${process.env.HOME}/.cf/config.json`;
+    const configPath = path.join(homedir(), ".cf", "config.json");
     if (!fs.existsSync(configPath)) {
       throw new Error("CF Config not found!");
     }

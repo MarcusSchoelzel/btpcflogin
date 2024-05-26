@@ -184,6 +184,7 @@ export class LoginFlow {
     const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
       type: "input",
       name: "favoriteName",
+      required: true,
       message: "Name for new Favorite",
     });
 

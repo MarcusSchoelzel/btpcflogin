@@ -24,8 +24,8 @@ program.name(packageJson.name).description(packageJson.description).version(pack
 
 program
   .command("login", { isDefault: true })
-  .option("-s,--store-favorite", "Stores cf target as favorite in config store")
-  .option("-f,--use-favorite", "Use favorite cf target to login faster")
+  .option("-s, --store-favorite", "Stores cf target as favorite in config store")
+  .option("-f, --use-favorite", "Use favorite cf target to login faster")
   .description("Login to Cloud Foundry")
   .action(({ storeFavorite, useFavorite }: { storeFavorite?: boolean; useFavorite?: boolean }) =>
     new LoginFlow(storeFavorite || false, useFavorite || false).run(),

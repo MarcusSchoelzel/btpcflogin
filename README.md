@@ -1,6 +1,6 @@
 # SAP BTP Cloud Foundry Login Helper
 
-This Node.js project makes it easier to login to the SAP BTP Cloud Foundry environment with the command line interface `cf` in Linux.
+This Node.js project makes it easier to login to the SAP BTP Cloud Foundry environment with the command line interface `cf`.
 You can find more information and installation instructions about the cf cli at
 [https://docs.cloudfoundry.org/cf-cli/install-go-cli.html](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html).
 

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2024-05-25
+
+### Added
+
+- New options `-s` and `-f` for default command, to store or use cf targets as favorites
+- New Command `sort-favs` to reorder the stored favorites
+- New Command `rm-fav` to remove a stored favorite from the config store
+- Org and space are now automatically chosen if only a single one exists in the region/org
+
+### Changed
+
+- `prepare` was renamed to `prepack` as `prepare` is also executed during `npm i`
+
 ## [1.3.0] - 2023-12-28
 
 ### Added
@@ -22,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New Command `sort-logins` to reorder the logins in the config store
-- New Command `remove-login` to delete pass login from the config store
+- New Command `rm-login` to delete pass login from the config store
 
 ### Changed
 

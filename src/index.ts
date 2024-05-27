@@ -10,6 +10,8 @@ import { addLogin } from "./commands/add-login.js";
 import { setCfTarget } from "./commands/set-target.js";
 import { removeLogin } from "./commands/remove-login.js";
 import { sortLogins } from "./commands/sort-logins.js";
+import { removeFavorite } from "./commands/remove-favorite.js";
+import { sortFavorites } from "./commands/sort-favorites.js";
 
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(getDirname(import.meta.url), "..", "package.json"), {
@@ -22,8 +24,22 @@ program.name(packageJson.name).description(packageJson.description).version(pack
 
 program
   .command("login", { isDefault: true })
+  .option("-s,--store-favorite", "Stores cf target as favorite in config store")
+  .option("-f,--use-favorite", "Use favorite cf target to login faster")
   .description("Login to Cloud Foundry")
-  .action(() => new LoginFlow().run());
+  .action(({ storeFavorite, useFavorite }: { storeFavorite?: boolean; useFavorite?: boolean }) =>
+    new LoginFlow(storeFavorite || false, useFavorite || false).run(),
+  );
+
+program
+  .command("rm-fav")
+  .description("Remove favorite from configstore")
+  .action(() => removeFavorite());
+
+program
+  .command("sort-favs")
+  .description("Sort the stored favorites in the configstore")
+  .action(() => sortFavorites());
 
 program
   .command("t")

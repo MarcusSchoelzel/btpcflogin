@@ -10,8 +10,13 @@ import { assertCmdInPath } from "../util/helper.js";
 
 export class LoginFlow {
   private cfCli: CloudFoundryCli;
-  constructor() {
+  private storeAsFavorite: boolean;
+  private useFavForLogin: boolean;
+
+  constructor(storeAsFavorite: boolean, useFavForLogin: boolean) {
     this.cfCli = new CloudFoundryCli();
+    this.storeAsFavorite = storeAsFavorite;
+    this.useFavForLogin = useFavForLogin;
   }
   async run() {
     try {
@@ -20,16 +25,11 @@ export class LoginFlow {
       clear();
       this.printIntro();
 
-      const { apiRegionDomain } = await this.cfCli.chooseApiRegion();
-      const chosenLoginKey = await this.getLoginKey();
-
-      if (chosenLoginKey === SSO_LOGIN_KEY) {
-        await this.loginWithSso(apiRegionDomain);
+      if (this.useFavForLogin) {
+        await this.loginWithFavorite();
       } else {
-        await this.loginWithStoredCreds(chosenLoginKey);
+        await this.loginInteractively();
       }
-
-      await this.cfCli.setTarget();
     } catch (error) {
       console.error(chalk.redBright(error));
     }
@@ -66,6 +66,55 @@ export class LoginFlow {
         ],
       })
     ).selection;
+  }
+
+  private async loginInteractively() {
+    const { apiRegionDomain } = await this.cfCli.chooseApiRegion();
+    const chosenLoginKey = await this.getLoginKey();
+
+    if (chosenLoginKey === SSO_LOGIN_KEY) {
+      await this.loginWithSso(apiRegionDomain);
+    } else {
+      await this.loginWithStoredCreds(chosenLoginKey);
+    }
+
+    await this.cfCli.setTargetInteractively();
+
+    if (this.storeAsFavorite) {
+      await this.addTargetToFavorites(chosenLoginKey);
+    }
+  }
+
+  private async loginWithFavorite() {
+    const favorites = new ConfigStoreProxy().getFavorites();
+    if (favorites.length === 0) {
+      console.log(chalk.yellowBright("No Favorites found. Running guided login..."));
+      this.storeAsFavorite = true;
+      return this.loginInteractively();
+    }
+
+    const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
+      type: "autocomplete",
+      name: "favoriteName",
+      message: "Choose Favorite for SAP BTP CF Login",
+      choices: favorites.map((f) => ({
+        name: f.name,
+        hint: `Region: ${f.region}, Org: ${f.org}, Space: ${f.space}${f.sso ? `, Login: ${f.passLogin}` : ""}`,
+      })),
+    });
+
+    const favorite = favorites.find((f) => f.name === favoriteName)!;
+    const { apiRegionDomain } = await this.cfCli.chooseApiRegion(favorite?.region);
+
+    if (favorite.sso) {
+      await this.loginWithSso(apiRegionDomain);
+    } else {
+      await this.loginWithStoredCreds(favorite?.passLogin!);
+    }
+    this.cfCli.setOrg(favorite.org);
+    this.cfCli.setSpace(favorite.space);
+
+    this.cfCli.printCurrentTarget();
   }
 
   private async loginWithSso(apiRegionDomain: string) {
@@ -119,5 +168,33 @@ export class LoginFlow {
     } else {
       throw new Error(`Invalid username config detected: "${username}".\nValid format: "username: test@user.com"`);
     }
+  }
+
+  private async addTargetToFavorites(chosenLoginKey: string) {
+    const currentConfig = this.cfCli.getCurrentConfig();
+    if (
+      currentConfig.OrganizationFields.Name === "" ||
+      currentConfig.SpaceFields.Name === "" ||
+      currentConfig.Target === ""
+    ) {
+      console.log(chalk.yellowBright("CF Target not fully set. No Favorite will be added!"));
+      return;
+    }
+
+    const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
+      type: "input",
+      name: "favoriteName",
+      required: true,
+      message: "Name for new Favorite",
+    });
+
+    new ConfigStoreProxy().addFavorite({
+      name: favoriteName,
+      org: currentConfig.OrganizationFields.Name,
+      space: currentConfig.SpaceFields.Name,
+      sso: chosenLoginKey === SSO_LOGIN_KEY,
+      passLogin: chosenLoginKey!,
+      region: currentConfig.Target.match(/https:\/\/api\.cf\.(\w+-?\d{1,4}?)\./)?.[1]!,
+    });
   }
 }

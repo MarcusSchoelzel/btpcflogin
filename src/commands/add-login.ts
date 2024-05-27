@@ -3,6 +3,7 @@ import fs from "fs";
 import chalk from "chalk";
 import { ConfigStoreProxy } from "../util/config-store.js";
 import path from "path";
+import { homedir } from "os";
 
 export async function addLogin() {
   try {
@@ -47,7 +48,7 @@ function readPasswordStoreLogins(path: string): string[] {
 }
 
 function getPassStorePath() {
-  return process.env.PASSWORD_STORE_DIR ?? `${process.env.HOME}/.password-store`;
+  return process.env.PASSWORD_STORE_DIR ?? path.join(homedir(), ".password-store");
 }
 
 function getGoPassStorePath() {

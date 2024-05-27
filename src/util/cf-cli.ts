@@ -4,12 +4,30 @@ import Enquirer from "enquirer";
 import ora from "ora";
 import path from "path";
 import fs from "fs";
+import z from "zod";
 
 import { getDirname } from "./helper.js";
+import { homedir } from "os";
 
 const NO_SPACES_FOUND = "No spaces found.";
 const NO_ORGS_FOUND = "No orgs found.";
 const SHELL_CANCELLED = "Process terminated!";
+
+const cfCliConfigSchema = z.object({
+  Target: z.string(),
+  SpaceFields: z.object({
+    Name: z.string(),
+  }),
+  OrganizationFields: z.object({
+    Name: z.string(),
+  }),
+});
+
+export type CfCliConfig = z.infer<typeof cfCliConfigSchema>;
+export type CfTarget = {
+  space: string;
+  org: string;
+};
 
 function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
   if (spawnResult.signal === "SIGINT") throw new Error(SHELL_CANCELLED);
@@ -65,17 +83,24 @@ export class CloudFoundryCli {
     }
     authProgress.stop();
   }
+
+  printCurrentTarget() {
+    console.log(chalk.cyanBright(this.getCurrentTarget()));
+  }
+
   async loginWithSso(ssoCode: string) {
     checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", ssoCode]));
   }
-  async setTarget() {
-    if (!(await this.setOrg())) return;
-    if (!(await this.setSpace())) return;
+
+  async setTargetInteractively() {
+    if (!(await this.setOrgInteractively())) return;
+    if (!(await this.setSpaceInteractively())) return;
 
     // print current cf target
-    console.log(chalk.cyanBright(this.getCurrentTarget()));
+    this.printCurrentTarget();
   }
-  async setSpace() {
+
+  async setSpaceInteractively() {
     const cfSpaces = this.getSpaces();
     if (!cfSpaces?.length) {
       console.log(chalk.yellowBright(NO_SPACES_FOUND));
@@ -85,7 +110,18 @@ export class CloudFoundryCli {
     await this.selectSpace(cfSpaces);
     return true;
   }
-  async setOrg() {
+
+  setSpace(cfSpace: string) {
+    const spaceProgress = ora("Switching space, please wait...").start();
+    try {
+      checkSpawnErrors(spawnSync("cf", ["target", "-s", cfSpace]));
+    } finally {
+      spaceProgress.stop();
+    }
+    spaceProgress.stop();
+  }
+
+  async setOrgInteractively() {
     const orgs = this.getOrgs();
     if (!orgs?.length) {
       console.log(chalk.yellowBright(NO_ORGS_FOUND));
@@ -96,11 +132,21 @@ export class CloudFoundryCli {
     return true;
   }
 
+  setOrg(orgName: string) {
+    const orgProgress = ora("Switching organisation, please wait...").start();
+    try {
+      checkSpawnErrors(spawnSync("cf", ["target", "-o", orgName]));
+    } finally {
+      orgProgress.stop();
+    }
+    orgProgress.stop();
+  }
+
   /**
    * Prompts for Cloud Foundry API region
    */
-  async chooseApiRegion(): Promise<{ apiRegionCode: string; apiRegionDomain: string }> {
-    const apiRegionCode = await this.getRegionCode();
+  async chooseApiRegion(region?: string): Promise<{ apiRegionCode: string; apiRegionDomain: string }> {
+    const apiRegionCode = region ? region : await this.getRegionCode();
     const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
 
     const apiProgress = ora("Switching region, please wait...").start();
@@ -113,6 +159,14 @@ export class CloudFoundryCli {
     apiProgress.stop();
 
     return { apiRegionCode, apiRegionDomain };
+  }
+
+  getCurrentConfig() {
+    const configPath = path.join(homedir(), ".cf", "config.json");
+    if (!fs.existsSync(configPath)) {
+      throw new Error("CF Config not found!");
+    }
+    return cfCliConfigSchema.parse(JSON.parse(fs.readFileSync(configPath, { encoding: "utf-8" })));
   }
 
   private getCurrentTarget() {
@@ -171,44 +225,45 @@ export class CloudFoundryCli {
    * Prompts space selection
    */
   private async selectSpace(cfSpaces: string[]) {
-    const cfSpace = (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "select",
-        name: "selection",
-        message: "Choose space",
-        choices: cfSpaces,
-      })
-    ).selection;
-
-    const spaceProgress = ora("Switching space, please wait...").start();
-    try {
-      spawnSync("cf", ["target", "-s", cfSpace]);
-    } finally {
-      spaceProgress.stop();
+    let cfSpace: string;
+    if (cfSpaces.length === 1) {
+      cfSpace = cfSpaces[0];
+      console.log(`${chalk.green("✔")} Setting only available Space ${chalk.gray("·")} ${chalk.cyan(cfSpace)}`);
+    } else {
+      cfSpace = (
+        await Enquirer.prompt<{ selection: string }>({
+          type: "select",
+          name: "selection",
+          message: "Choose space",
+          choices: cfSpaces,
+        })
+      ).selection;
     }
-    spaceProgress.stop();
+
+    this.setSpace(cfSpace);
   }
 
   /**
    * Prompts org selection
    */
   private async selectOrg(cfOrgs: string[]) {
-    const cfOrg = (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "select",
-        name: "selection",
-        message: "Choose organisation",
-        choices: cfOrgs,
-      })
-    ).selection;
+    let cfOrg: string;
 
-    const orgProgress = ora("Switching organisation, please wait...").start();
-    try {
-      spawnSync("cf", ["target", "-o", cfOrg]);
-    } finally {
-      orgProgress.stop();
+    if (cfOrgs.length === 1) {
+      cfOrg = cfOrgs[0];
+      console.log(`${chalk.green("✔")} Setting only available org ${chalk.gray("·")} ${chalk.cyan(cfOrg)}`);
+    } else {
+      cfOrg = (
+        await Enquirer.prompt<{ selection: string }>({
+          type: "select",
+          name: "selection",
+          message: "Choose organisation",
+          choices: cfOrgs,
+        })
+      ).selection;
     }
-    orgProgress.stop();
+
+    this.setOrg(cfOrg);
   }
 
   /**

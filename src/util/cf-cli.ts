@@ -103,7 +103,8 @@ export class CloudFoundryCli {
   setSpace(cfSpace: string) {
     const spaceProgress = ora("Switching space, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-s", cfSpace]));
+      // HINT: Special characters in space name are possible but are not escapable (e.g. '"', '$')
+      checkSpawnErrors(spawnSync("cf", ["target", "-s", `"${cfSpace}"`]));
     } finally {
       spaceProgress.stop();
     }
@@ -124,7 +125,7 @@ export class CloudFoundryCli {
   setOrg(orgName: string) {
     const orgProgress = ora("Switching organisation, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-o", orgName]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-o", `"${orgName}"`]));
     } finally {
       orgProgress.stop();
     }

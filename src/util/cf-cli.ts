@@ -44,6 +44,10 @@ function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
   }
 }
 
+/**
+ * Surrounds given value in double quotes and replaces characters
+ * depending on platform
+ */
 function escapePassword(val: string) {
   if (process.platform === "win32") {
     // Escapes '"' character

@@ -44,40 +44,33 @@ function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
   }
 }
 
+/**
+ * Surrounds given value in double quotes and replaces characters
+ * depending on platform
+ */
+function escapePassword(val: string) {
+  if (process.platform === "win32") {
+    // Escapes '"' character
+    return `"${val.replace(/"/g, `"$&`)}"`;
+  } else {
+    // Escapes '"' and '$' characters
+    return `"${val.replace(/("|\$)/g, `\\$&`)}"`;
+  }
+}
+
 export class CloudFoundryCli {
   async login(user: string, password: string, origin?: string) {
     const authProgress = ora("Authenticating you, please wait...").start();
 
     try {
       // cf auth username "password" [--origin idp-origin]
-      if (process.platform === "win32") {
-        checkSpawnErrors(
-          spawnSync(
-            "cf",
-            // Escapes '"' character
-            ["auth", user, `"${password.replace(/"/g, `"$&`)}"`, ...(origin ? ["--origin", origin] : [])],
-            {
-              // cmd shell seems to be easier to handle in terms of escaping meta characters
-              shell: "cmd.exe",
-            },
-          ),
-        );
-      } else {
-        checkSpawnErrors(
-          spawnSync(
-            "cf",
-            [
-              "auth",
-              user,
-              // Escapes '"' and '$' characters
-              `"${password.replace(/("|\$)/g, `\\$&`)}"`,
-              ...(origin ? ["--origin", origin] : []),
-            ],
-            // shell=true is required, otherwise quotes will be stripped from password
-            { shell: true },
-          ),
-        );
-      }
+      checkSpawnErrors(
+        spawnSync("cf", ["auth", user, escapePassword(password), ...(origin ? ["--origin", `"${origin}"`] : [])], {
+          // win: cmd.exe shell seems to be easier to handle in terms of escaping meta characters
+          // linux: {shell: true} prevent stripping quotes
+          shell: process.platform === "win32" ? "cmd.exe" : true,
+        }),
+      );
     } finally {
       authProgress.stop();
     }
@@ -89,7 +82,7 @@ export class CloudFoundryCli {
   }
 
   async loginWithSso(ssoCode: string) {
-    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", ssoCode]));
+    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", escapePassword(ssoCode)]));
   }
 
   async setTargetInteractively() {
@@ -114,7 +107,8 @@ export class CloudFoundryCli {
   setSpace(cfSpace: string) {
     const spaceProgress = ora("Switching space, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-s", cfSpace]));
+      // HINT: Special characters in space name are possible but are not escapable (e.g. '"', '$')
+      checkSpawnErrors(spawnSync("cf", ["target", "-s", `"${cfSpace}"`]));
     } finally {
       spaceProgress.stop();
     }
@@ -135,7 +129,7 @@ export class CloudFoundryCli {
   setOrg(orgName: string) {
     const orgProgress = ora("Switching organisation, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-o", orgName]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-o", `"${orgName}"`]));
     } finally {
       orgProgress.stop();
     }

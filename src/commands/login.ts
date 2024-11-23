@@ -7,6 +7,7 @@ import { spawnSync } from "child_process";
 import { SSO_LOGIN_KEY, ConfigStoreProxy } from "../util/config-store.js";
 import { CloudFoundryCli } from "../util/cf-cli.js";
 import { assertCmdInPath } from "../util/helper.js";
+import { mapToPromptChoices } from "../util/favorites.js";
 
 export class LoginFlow {
   private cfCli: CloudFoundryCli;
@@ -97,10 +98,7 @@ export class LoginFlow {
       type: "autocomplete",
       name: "favoriteName",
       message: "Choose Favorite for SAP BTP CF Login",
-      choices: favorites.map((f) => ({
-        name: f.name,
-        hint: `Region: ${f.region}, Org: ${f.org}, Space: ${f.space}${f.sso ? `, Login: ${f.passLogin}` : ""}`,
-      })),
+      choices: mapToPromptChoices(favorites),
     });
 
     const favorite = favorites.find((f) => f.name === favoriteName)!;

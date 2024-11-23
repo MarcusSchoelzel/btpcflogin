@@ -1,6 +1,7 @@
 import Enquirer from "enquirer";
 import { ConfigStoreProxy } from "../util/config-store.js";
 import chalk from "chalk";
+import { mapToPromptChoices } from "../util/favorites.js";
 
 export async function removeFavorite() {
   const configStore = new ConfigStoreProxy();
@@ -16,7 +17,7 @@ export async function removeFavorite() {
       type: "autocomplete",
       name: "favToRemove",
       message: "Select favorite to remove",
-      choices: storedFavorites,
+      choices: mapToPromptChoices(storedFavorites),
     });
 
     storedFavorites.splice(

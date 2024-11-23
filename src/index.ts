@@ -12,6 +12,7 @@ import { removeLogin } from "./commands/remove-login.js";
 import { sortLogins } from "./commands/sort-logins.js";
 import { removeFavorite } from "./commands/remove-favorite.js";
 import { sortFavorites } from "./commands/sort-favorites.js";
+import { renameFavorite } from "./commands/rename-favorite.js";
 
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(getDirname(import.meta.url), "..", "package.json"), {
@@ -40,6 +41,11 @@ program
   .command("sort-favs")
   .description("Sort the stored favorites in the configstore")
   .action(() => sortFavorites());
+
+program
+  .command("rename-fav")
+  .description("Rename a stored favorite in the configstore")
+  .action(() => renameFavorite());
 
 program
   .command("t")

@@ -1,6 +1,7 @@
 import Enquirer from "enquirer";
-import { ConfigStoreProxy, Favorite } from "../util/config-store.js";
+import { ConfigStoreProxy } from "../util/config-store.js";
 import chalk from "chalk";
+import { Favorite } from "../util/favorites.js";
 
 export async function sortFavorites() {
   const configStore = new ConfigStoreProxy();

@@ -179,20 +179,58 @@ export class LoginFlow {
       return;
     }
 
-    const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
-      type: "input",
-      name: "favoriteName",
-      required: true,
-      message: "Name for new Favorite",
-    });
+    const configstore = new ConfigStoreProxy();
+    const { favName, overwrite } = await this.promptForFavName(configstore.getFavorites().map((f) => f.name));
+    configstore.addFavorite(
+      {
+        name: favName,
+        org: currentConfig.OrganizationFields.Name,
+        space: currentConfig.SpaceFields.Name,
+        sso: chosenLoginKey === SSO_LOGIN_KEY,
+        passLogin: chosenLoginKey!,
+        region: currentConfig.Target.match(/https:\/\/api\.cf\.(\w+-?\d{1,4}?)\./)?.[1]!,
+      },
+      overwrite,
+    );
+  }
 
-    new ConfigStoreProxy().addFavorite({
-      name: favoriteName,
-      org: currentConfig.OrganizationFields.Name,
-      space: currentConfig.SpaceFields.Name,
-      sso: chosenLoginKey === SSO_LOGIN_KEY,
-      passLogin: chosenLoginKey!,
-      region: currentConfig.Target.match(/https:\/\/api\.cf\.(\w+-?\d{1,4}?)\./)?.[1]!,
-    });
+  /**
+   * Prompts for favorite name until a new one is chosen or the user
+   * confirmed that an existing will favorite will be overwritten
+   */
+  private async promptForFavName(existingFavorites: string[]) {
+    let overwrite = false;
+
+    const promptName = async () => {
+      const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
+        type: "input",
+        name: "favoriteName",
+        required: true,
+        message: "Name for new Favorite",
+      });
+
+      // check if favorite should be overwritten or not
+      if (existingFavorites.includes(favoriteName)) {
+        const answer = await Enquirer.prompt<{ overwrite: boolean }>({
+          type: "confirm",
+          name: "overwrite",
+          message: "Favorite already exists. Do you wish to overwrite it?",
+        });
+        overwrite = answer.overwrite;
+        if (overwrite) {
+          return favoriteName;
+        } else {
+          return undefined;
+        }
+      }
+      return favoriteName;
+    };
+
+    let favName: string | undefined;
+    do {
+      favName = await promptName();
+    } while (!favName);
+
+    return { favName, overwrite };
   }
 }

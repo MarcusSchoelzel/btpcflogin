@@ -69,14 +69,21 @@ export class ConfigStoreProxy {
     }
   }
 
-  addFavorite(favorite: Favorite) {
+  addFavorite(favorite: Favorite, overwrite = false) {
     const favorites = this.getFavorites();
 
-    if (favorites.findIndex((f) => f.name === favorite.name) !== -1) {
-      throw new Error(`A favorite cf target with name '${favorite.name} already exists!`);
+    const existingIndex = favorites.findIndex((f) => f.name === favorite.name);
+    if (existingIndex !== -1) {
+      if (overwrite) {
+        favorites[existingIndex] = favorite;
+      } else {
+        throw new Error(`A favorite cf target with name '${favorite.name} already exists!`);
+      }
+    } else {
+      favorites.push(favorite);
     }
 
-    this.config.set(FAVORITE_TARGETS, [...favorites, favorite]);
+    this.config.set(FAVORITE_TARGETS, favorites);
   }
 
   setFavorites(favorites: Favorite[]) {

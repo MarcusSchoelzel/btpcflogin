@@ -1,7 +1,7 @@
 import Enquirer from "enquirer";
 import { ConfigStoreProxy } from "../util/config-store.js";
 import chalk from "chalk";
-import { Favorite } from "../util/favorites.js";
+import { Favorite, mapToPromptChoices } from "../util/favorites.js";
 
 export async function sortFavorites() {
   const configStore = new ConfigStoreProxy();
@@ -22,7 +22,7 @@ export async function sortFavorites() {
       type: "sort",
       name: "sortedFavNames",
       message: "Reorder Favorites",
-      choices: storedFavorites.map((f) => f.name),
+      choices: mapToPromptChoices(storedFavorites),
     } as any);
 
     const sortedFavorites: Favorite[] = [];

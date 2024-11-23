@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Removing a favorite, added enquirer properties in the `favoriteTargits` array of `btpcflogin`'s config store file
+- Removing a favorite added enquirer properties in the `favoriteTargits` array of `btpcflogin`'s config store file
 
 ## [1.4.1] - 2024-07-02
 

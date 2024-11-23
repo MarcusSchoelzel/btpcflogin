@@ -1,5 +1,5 @@
 import Configstore from "configstore";
-import z from "zod";
+import { Favorite, favoritesSchema } from "./favorites.js";
 
 const STORE_NAME = "btpcflogin";
 const PASS_LOGINS_STORE_KEY = "passLogins";
@@ -9,18 +9,6 @@ export const DEFAULT_IDP = "Default IdP";
 export const SSO_LOGIN_KEY = "single-sign-on";
 
 type Logins = string[];
-
-const favoriteSchema = z.object({
-  name: z.string(),
-  region: z.string(),
-  org: z.string(),
-  space: z.string(),
-  sso: z.boolean(),
-  passLogin: z.string().optional(),
-});
-const favoritesSchema = favoriteSchema.array().optional();
-
-export type Favorite = z.infer<typeof favoriteSchema>;
 
 export class ConfigStoreProxy {
   private config: Configstore;

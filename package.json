@@ -22,26 +22,26 @@
     "format": "prettier -w ./src"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
+    "chalk": "^5.4.1",
     "clear": "^0.1.0",
-    "commander": "^12.1.0",
-    "configstore": "^6.0.0",
+    "commander": "^13.1.0",
+    "configstore": "^7.0.0",
     "enquirer": "^2.4.1",
-    "figlet": "^1.7.0",
-    "ora": "8.0.1",
-    "which": "^4.0.0",
-    "zod": "^3.23.8"
+    "figlet": "^1.8.0",
+    "ora": "^8.2.0",
+    "which": "^5.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@tsconfig/node14": "^14.1.2",
     "@types/clear": "^0.1.4",
     "@types/configstore": "^6.0.2",
-    "@types/figlet": "^1.5.8",
-    "@types/node": "^20.12.12",
-    "@types/which": "^3.0.3",
-    "prettier": "^3.2.5",
-    "tsx": "^4.11.0",
-    "typescript": "^5.4.5"
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^22.13.8",
+    "@types/which": "^3.0.4",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
   },
   "prettier": {
     "printWidth": 120

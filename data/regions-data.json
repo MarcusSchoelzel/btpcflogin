@@ -1,12 +1,12 @@
 [
   {
-    "name": "ap11",
-    "message": "ap11     - Asia Pacific (Singapore)",
+    "name": "ap12",
+    "message": "ap12     - Asia Pacific (Seoul) ",
     "hint": "Amazon Web Services"
   },
   {
-    "name": "ap12",
-    "message": "ap12     - Asia Pacific (Seoul) ",
+    "name": "ap11",
+    "message": "ap11     - Asia Pacific (Singapore)",
     "hint": "Amazon Web Services"
   },
   {
@@ -20,9 +20,19 @@
     "hint": "Microsoft Azure"
   },
   {
+    "name": "ap30",
+    "message": "ap30     - Australia (Sydney)",
+    "hint": "Google Cloud"
+  },
+  {
     "name": "br10",
     "message": "br10     - Brazil (São Paulo)",
     "hint": "Amazon Web Services"
+  },
+  {
+    "name": "br20",
+    "message": "br20     - Brazil (São Paulo)",
+    "hint": "Microsoft Azure"
   },
   {
     "name": "ca10",
@@ -55,6 +65,11 @@
     "hint": "Amazon Web Services"
   },
   {
+    "name": "eu10-005",
+    "message": "eu10-005 - Europe (Frankfurt)",
+    "hint": "Amazon Web Services"
+  },
+  {
     "name": "eu11",
     "message": "eu11     - Europe (Frankfurt)",
     "hint": "Amazon Web Services"
@@ -80,6 +95,11 @@
     "hint": "Google Cloud"
   },
   {
+    "name": "il30",
+    "message": "il30     - Israel (Tel Aviv)",
+    "hint": "Google Cloud"
+  },
+  {
     "name": "jp10",
     "message": "jp10     - Japan (Tokyo)",
     "hint": "Amazon Web Services"
@@ -90,6 +110,11 @@
     "hint": "Microsoft Azure"
   },
   {
+    "name": "sa30",
+    "message": "sa30     - KSA (Dammam)",
+    "hint": "Google Cloud"
+  },
+  {
     "name": "ap21",
     "message": "ap21     - Singapore",
     "hint": "Microsoft Azure"
@@ -98,6 +123,11 @@
     "name": "ch20",
     "message": "ch20     - Switzerland (Zurich)",
     "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us30",
+    "message": "us30     - US Central (IA)",
+    "hint": "Google Cloud"
   },
   {
     "name": "us10",
@@ -120,13 +150,13 @@
     "hint": "Microsoft Azure"
   },
   {
+    "name": "us11",
+    "message": "us11     - US West (Oregon)",
+    "hint": "Amazon Web Services"
+  },
+  {
     "name": "us20",
     "message": "us20     - US West (WA)",
     "hint": "Microsoft Azure"
-  },
-  {
-    "name": "us30",
-    "message": "us30     - US Central (IA)",
-    "hint": "Google Cloud"
   }
 ]

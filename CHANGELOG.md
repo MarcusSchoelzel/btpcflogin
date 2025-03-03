@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2025-03-03
+
+### Added
+
+- New regions:
+  - ap30     - Australia (Sydney) - Google Cloud
+  - br20     - Brazil (São Paulo) - Microsoft Azure
+  - eu10-005 - Europe (Frankfurt) - Amazon Web Services
+  - il30     - Israel (Tel Aviv)  - Google Cloud
+  - sa30     - KSA (Dammam)       - Google Cloud
+  - us11     - US West (Oregon)   - Amazon Web Services
+
+- Github action for automatic publish to npm registry on creation of an github release
+
+### Changed
+
+- Update npm dependencies
+
 ## [1.5.0] - 2024-11-23
 
 ### Added
@@ -82,14 +100,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New regions:
-
-  - eu10-002 - Europe (Frankfurt) - Amazon Web Services
-  - eu10-003 - Europe (Frankfurt) - Amazon Web Services
+  - eu10-002 - Europe (Frankfurt)   - Amazon Web Services
+  - eu10-003 - Europe (Frankfurt)   - Amazon Web Services
   - eu20-001 - Europe (Netherlands) - Microsoft Azure
-  - us10-001 - US East (VA) - Amazon Web Services
-  - us10-002 - US East (VA) - Amazon Web Services
-  - in30 - India (Mumbai) - Google Cloud
-  - ch20 - Switzerland (Zurich) - Microsoft Azure
+  - us10-001 - US East (VA)         - Amazon Web Services
+  - us10-002 - US East (VA)         - Amazon Web Services
+  - in30     - India (Mumbai)       - Google Cloud
+  - ch20     - Switzerland (Zurich) - Microsoft Azure
 
 - Script `prepare` for publish of npm package (to not forget typescript transpile)
 - Additional key words
@@ -109,7 +126,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New regions:
-
   - eu10-004 - Europe (Frankfurt) - Amazon Web Services
   - eu30     - Europe (Frankfurt) - Google Cloud
 

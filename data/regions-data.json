@@ -35,9 +35,24 @@
     "hint": "Microsoft Azure"
   },
   {
+    "name": "br30",
+    "message": "br30     - Brazil (São Paulo)",
+    "hint": "Google Cloud"
+  },
+  {
     "name": "ca10",
     "message": "ca10     - Canada (Montreal)",
     "hint": "Amazon Web Services"
+  },
+  {
+    "name": "ca20",
+    "message": "ca20     - Canada Central (Toronto)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "cn20",
+    "message": "cn20     - China North 3 (Hebei)",
+    "hint": "Microsoft Azure"
   },
   {
     "name": "cn40",
@@ -110,8 +125,23 @@
     "hint": "Microsoft Azure"
   },
   {
+    "name": "jp30",
+    "message": "jp30     - Japan (Osaka)",
+    "hint": "Google Cloud"
+  },
+  {
+    "name": "jp31",
+    "message": "jp31     - Japan (Tokyo)",
+    "hint": "Google Cloud"
+  },
+  {
     "name": "sa30",
     "message": "sa30     - KSA (Dammam)",
+    "hint": "Google Cloud"
+  },
+  {
+    "name": "sa31",
+    "message": "sa31     - KSA (Dammam)",
     "hint": "Google Cloud"
   },
   {

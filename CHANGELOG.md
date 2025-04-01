@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2025-04-01
+
+### Added
+
+- New regions:
+  - br30 - Brazil (São Paulo)       - Google Cloud
+  - ca20 - Canada Central (Toronto) - Microsoft Azure
+  - cn20 - China North 3 (Hebei)    - Microsoft Azure
+  - jp30 - Japan (Osaka)            - Google Cloud
+  - jp31 - Japan (Tokyo)            - Google Cloud
+  - sa31 - KSA (Dammam)             - Google Cloud
+
 ## [1.5.1] - 2025-03-03
 
 ### Added

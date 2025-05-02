@@ -141,7 +141,7 @@ export class CloudFoundryCli {
    */
   async chooseApiRegion(region?: string): Promise<{ apiRegionCode: string; apiRegionDomain: string }> {
     const apiRegionCode = region ? region : await this.getRegionCode();
-    const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
+    const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" || apiRegionCode === "cn20" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
 
     const apiProgress = ora("Switching region, please wait...").start();
 
@@ -273,7 +273,7 @@ export class CloudFoundryCli {
         type: "autocomplete",
         name: "selection",
         message: "Choose BTP Cloud Foundry region",
-        initial: 7,
+        initial: 18,
         choices: JSON.parse(
           fs
             .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {

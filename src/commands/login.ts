@@ -1,5 +1,4 @@
 import Enquirer from "enquirer";
-import clear from "clear";
 import chalk from "chalk";
 import figlet from "figlet";
 import { spawnSync } from "child_process";
@@ -23,7 +22,7 @@ export class LoginFlow {
     try {
       await assertCmdInPath("cf");
 
-      clear();
+      console.clear();
       this.printIntro();
 
       if (this.useFavForLogin) {

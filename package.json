@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "chalk": "^6.0.0",
-    "clear": "^0.1.0",
     "commander": "^15.0.0",
     "configstore": "^8.0.0",
     "enquirer": "^2.4.1",
@@ -34,7 +33,6 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.5",
-    "@types/clear": "^0.1.4",
     "@types/configstore": "^6.0.2",
     "@types/figlet": "^1.7.0",
     "@types/node": "^26.1.2",

@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-08-03
+
+### Added
+
+- Support for macOS by using [KeePassXC](https://keepassxc.org/) (`keepassxc-cli`) as credential manager
+  - Credentials are read from the entry fields `Username`/`Password` and the optional additional attribute `origin`
+  - Path to the database is stored in the config store and can be overridden with env var `BTPCFLOGIN_KDBX`
+  - If `keepassxc-cli` is not on the PATH, the executable bundled with the KeePassXC app is detected automatically and stored in the config store after confirmation
+  - The database password can optionally be remembered in the macOS Keychain (opt-in via confirmation prompt, outdated entries are updated automatically)
+- New regions:
+  - ae01     - UAE (Dubai)                          - SAP Cloud Infrastructure
+  - ap01     - Australia (Sydney)                   - SAP Cloud Infrastructure
+  - eu01     - Europe (Frankfurt) - EU Access Only  - SAP Cloud Infrastructure
+  - eu02     - Europe (Rot) - SAP EU Access         - SAP Cloud Infrastructure
+  - eu13     - Europe (Milan)                       - Amazon Web Services
+  - eu20-002 - Europe (Netherlands)                 - Microsoft Azure
+  - eu22     - Europe (Frankfurt)                   - Microsoft Azure
+  - jp01     - Japan (Tokyo)                        - SAP Cloud Infrastructure
+  - uk20     - UK South (London)                    - Microsoft Azure
+  - us01     - US (Sterling)                        - SAP Cloud Infrastructure
+  - us02     - US West (Colorado)                   - SAP Cloud Infrastructure
+- Unit test suite (`npm test`) based on the Node.js built-in test runner - no additional dependencies
+- Github action that runs the unit tests on Linux, macOS and Windows for every push and pull request
+
+### Changed
+
+- **BREAKING**: Node.js 22.12 or higher is required (dependency updates)
+- Update npm dependencies (major bumps: chalk 6, commander 15, configstore 8, ora 9, which 7, zod 4, typescript 7)
+- Region names aligned with SAP Help documentation (cn20, sa30, sa31)
+- Replace unmaintained prompt library `enquirer` with the actively maintained `@inquirer/prompts`
+  - Reordering in `sort-logins`/`sort-favs` now works with `<space>` to grab/release and `↑`/`↓` to move an entry
+- Replace unmaintained package `clear` with Node's built-in `console.clear()`
+- npm releases are published via [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)
+  with provenance attestation, instead of a long-lived automation token
+
+### Fixed
+
+- The cf CLI is now invoked without an intermediate shell: passwords, SSO passcodes, org and space
+  names are passed verbatim, so all special characters work reliably and shell injection is impossible.
+  This also resolves the Node.js deprecation warning DEP0190.
+- Github publish workflow limits the permissions of its access token
+- Local tool settings and github workflows are no longer packed into the published npm package
+
 ## [1.5.2] - 2025-04-01
 
 ### Added

@@ -29,6 +29,10 @@ Install as shell command from source:
 3. `npx tsc`
 4. `npm i -g`
 
+Run the unit tests:
+
+`npm test`
+
 ## Available Commands
 
 - `login` (default)  

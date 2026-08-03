@@ -19,7 +19,8 @@
   "scripts": {
     "prepack": "tsc",
     "local": "tsx ./src/index.ts",
-    "format": "prettier -w ./src"
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "format": "prettier -w ./src ./test"
   },
   "dependencies": {
     "@inquirer/core": "^11.2.1",

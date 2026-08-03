@@ -1,5 +1,6 @@
-import Enquirer from "enquirer";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { printCliError } from "../util/helper.js";
+import { reorder } from "../util/prompts.js";
 import chalk from "chalk";
 
 /**
@@ -20,17 +21,13 @@ export async function sortLogins() {
       return;
     }
 
-    const sortedLogins = (
-      await Enquirer.prompt<{ logins: string[] }>({
-        type: "sort",
-        name: "logins",
-        message: "Reorder pass logins",
-        choices: storedLogins,
-      } as any)
-    ).logins;
+    const sortedLogins = await reorder({
+      message: "Reorder pass logins",
+      choices: storedLogins.map((login) => ({ value: login })),
+    });
 
     configStore.setLogins(sortedLogins);
   } catch (error) {
-    console.error(chalk.redBright(error));
+    printCliError(error);
   }
 }

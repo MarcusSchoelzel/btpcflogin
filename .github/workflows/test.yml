@@ -1,0 +1,31 @@
+# Runs the unit test suite on every push and pull request,
+# across all supported operating systems and Node.js versions
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # 22.12 is the minimum supported version (see engines in package.json),
+        # 24 is the current Active LTS, 26 is the current (pre-LTS) release
+        node: ["22.12", "24", "26"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npx tsc
+      - run: npm test

@@ -4,6 +4,9 @@ import { Favorite, favoritesSchema } from "./favorites.js";
 const STORE_NAME = "btpcflogin";
 const PASS_LOGINS_STORE_KEY = "passLogins";
 const FAVORITE_TARGETS = "favoriteTargets";
+const KEEPASSXC_DATABASE_KEY = "keePassXcDatabase";
+const KEEPASSXC_CLI_PATH_KEY = "keePassXcCli";
+const KEEPASSXC_KEYCHAIN_KEY = "keePassXcKeychain";
 
 export const DEFAULT_IDP = "Default IdP";
 export const SSO_LOGIN_KEY = "single-sign-on";
@@ -59,6 +62,49 @@ export class ConfigStoreProxy {
     } else {
       throw new Error(`Pass Login "${loginId}" not found in Config store`);
     }
+  }
+
+  /**
+   * Retrieves stored path to the KeePassXC database file
+   */
+  getKeePassXcDatabase(): string | undefined {
+    return this.config.get(KEEPASSXC_DATABASE_KEY);
+  }
+
+  /**
+   * Stores the path to the KeePassXC database file
+   */
+  setKeePassXcDatabase(databasePath: string) {
+    this.config.set(KEEPASSXC_DATABASE_KEY, databasePath);
+  }
+
+  /**
+   * Retrieves stored path to the 'keepassxc-cli' executable
+   */
+  getKeePassXcCliPath(): string | undefined {
+    return this.config.get(KEEPASSXC_CLI_PATH_KEY);
+  }
+
+  /**
+   * Stores the path to the 'keepassxc-cli' executable
+   */
+  setKeePassXcCliPath(cliPath: string) {
+    this.config.set(KEEPASSXC_CLI_PATH_KEY, cliPath);
+  }
+
+  /**
+   * Retrieves whether the KeePassXC database password may be stored
+   * in the macOS Keychain (undefined = user was not asked yet)
+   */
+  getKeePassXcKeychainOptIn(): boolean | undefined {
+    return this.config.get(KEEPASSXC_KEYCHAIN_KEY);
+  }
+
+  /**
+   * Stores whether the KeePassXC database password may be stored in the macOS Keychain
+   */
+  setKeePassXcKeychainOptIn(optIn: boolean) {
+    this.config.set(KEEPASSXC_KEYCHAIN_KEY, optIn);
   }
 
   getFavorites(): Favorite[] {

@@ -1,12 +1,13 @@
+import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { SpawnSyncReturns, spawnSync } from "child_process";
-import Enquirer from "enquirer";
 import ora from "ora";
 import path from "path";
 import fs from "fs";
 import z from "zod";
 
 import { getDirname } from "./helper.js";
+import { autocomplete } from "./prompts.js";
 import { homedir } from "os";
 
 const NO_SPACES_FOUND = "No spaces found.";
@@ -44,33 +45,14 @@ function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
   }
 }
 
-/**
- * Surrounds given value in double quotes and replaces characters
- * depending on platform
- */
-function escapePassword(val: string) {
-  if (process.platform === "win32") {
-    // Escapes '"' character
-    return `"${val.replace(/"/g, `"$&`)}"`;
-  } else {
-    // Escapes '"' and '$' characters
-    return `"${val.replace(/("|\$)/g, `\\$&`)}"`;
-  }
-}
-
 export class CloudFoundryCli {
   async login(user: string, password: string, origin?: string) {
     const authProgress = ora("Authenticating you, please wait...").start();
 
     try {
-      // cf auth username "password" [--origin idp-origin]
-      checkSpawnErrors(
-        spawnSync("cf", ["auth", user, escapePassword(password), ...(origin ? ["--origin", `"${origin}"`] : [])], {
-          // win: cmd.exe shell seems to be easier to handle in terms of escaping meta characters
-          // linux: {shell: true} prevent stripping quotes
-          shell: process.platform === "win32" ? "cmd.exe" : true,
-        }),
-      );
+      // cf auth username password [--origin idp-origin]
+      // no shell is involved, so all values are passed verbatim and need no escaping
+      checkSpawnErrors(spawnSync("cf", ["auth", user, password, ...(origin ? ["--origin", origin] : [])]));
     } finally {
       authProgress.stop();
     }
@@ -82,7 +64,7 @@ export class CloudFoundryCli {
   }
 
   async loginWithSso(ssoCode: string) {
-    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", escapePassword(ssoCode)]));
+    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", ssoCode]));
   }
 
   async setTargetInteractively() {
@@ -107,8 +89,7 @@ export class CloudFoundryCli {
   setSpace(cfSpace: string) {
     const spaceProgress = ora("Switching space, please wait...").start();
     try {
-      // HINT: Special characters in space name are possible but are not escapable (e.g. '"', '$')
-      checkSpawnErrors(spawnSync("cf", ["target", "-s", `"${cfSpace}"`]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-s", cfSpace]));
     } finally {
       spaceProgress.stop();
     }
@@ -129,7 +110,7 @@ export class CloudFoundryCli {
   setOrg(orgName: string) {
     const orgProgress = ora("Switching organisation, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-o", `"${orgName}"`]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-o", orgName]));
     } finally {
       orgProgress.stop();
     }
@@ -141,7 +122,9 @@ export class CloudFoundryCli {
    */
   async chooseApiRegion(region?: string): Promise<{ apiRegionCode: string; apiRegionDomain: string }> {
     const apiRegionCode = region ? region : await this.getRegionCode();
-    const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" || apiRegionCode === "cn20" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
+    const apiRegionDomain =
+      apiRegionCode +
+      (apiRegionCode === "cn40" || apiRegionCode === "cn20" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
 
     const apiProgress = ora("Switching region, please wait...").start();
 
@@ -224,14 +207,10 @@ export class CloudFoundryCli {
       cfSpace = cfSpaces[0];
       console.log(`${chalk.green("✔")} Setting only available Space ${chalk.gray("·")} ${chalk.cyan(cfSpace)}`);
     } else {
-      cfSpace = (
-        await Enquirer.prompt<{ selection: string }>({
-          type: "select",
-          name: "selection",
-          message: "Choose space",
-          choices: cfSpaces,
-        })
-      ).selection;
+      cfSpace = await select({
+        message: "Choose space",
+        choices: cfSpaces.map((space) => ({ value: space })),
+      });
     }
 
     this.setSpace(cfSpace);
@@ -247,14 +226,10 @@ export class CloudFoundryCli {
       cfOrg = cfOrgs[0];
       console.log(`${chalk.green("✔")} Setting only available org ${chalk.gray("·")} ${chalk.cyan(cfOrg)}`);
     } else {
-      cfOrg = (
-        await Enquirer.prompt<{ selection: string }>({
-          type: "select",
-          name: "selection",
-          message: "Choose organisation",
-          choices: cfOrgs,
-        })
-      ).selection;
+      cfOrg = await select({
+        message: "Choose organisation",
+        choices: cfOrgs.map((org) => ({ value: org })),
+      });
     }
 
     this.setOrg(cfOrg);
@@ -268,20 +243,22 @@ export class CloudFoundryCli {
    * @returns chosen Cloud Foundry region via prompt
    */
   private async getRegionCode(): Promise<string> {
-    return (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "autocomplete",
-        name: "selection",
-        message: "Choose BTP Cloud Foundry region",
-        initial: 18,
-        choices: JSON.parse(
-          fs
-            .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {
-              encoding: "utf-8",
-            })
-            .toString(),
-        ),
-      })
-    ).selection;
+    const regions = JSON.parse(
+      fs
+        .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {
+          encoding: "utf-8",
+        })
+        .toString(),
+    ) as { name: string; message: string; hint: string }[];
+
+    return autocomplete({
+      message: "Choose BTP Cloud Foundry region",
+      default: "eu20",
+      choices: regions.map((region) => ({
+        value: region.name,
+        name: region.message,
+        description: region.hint,
+      })),
+    });
   }
 }

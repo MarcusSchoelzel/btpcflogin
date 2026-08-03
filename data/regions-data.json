@@ -1,7 +1,7 @@
 [
   {
     "name": "ap12",
-    "message": "ap12     - Asia Pacific (Seoul) ",
+    "message": "ap12     - Asia Pacific (Seoul)",
     "hint": "Amazon Web Services"
   },
   {
@@ -23,6 +23,11 @@
     "name": "ap30",
     "message": "ap30     - Australia (Sydney)",
     "hint": "Google Cloud"
+  },
+  {
+    "name": "ap01",
+    "message": "ap01     - Australia (Sydney)",
+    "hint": "SAP Cloud Infrastructure"
   },
   {
     "name": "br10",
@@ -51,7 +56,7 @@
   },
   {
     "name": "cn20",
-    "message": "cn20     - China North 3 (Hebei)",
+    "message": "cn20     - China (North 3)",
     "hint": "Microsoft Azure"
   },
   {
@@ -90,6 +95,26 @@
     "hint": "Amazon Web Services"
   },
   {
+    "name": "eu22",
+    "message": "eu22     - Europe (Frankfurt)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "eu30",
+    "message": "eu30     - Europe (Frankfurt)",
+    "hint": "Google Cloud"
+  },
+  {
+    "name": "eu01",
+    "message": "eu01     - Europe (Frankfurt) - EU Access Only",
+    "hint": "SAP Cloud Infrastructure"
+  },
+  {
+    "name": "eu13",
+    "message": "eu13     - Europe (Milan)",
+    "hint": "Amazon Web Services"
+  },
+  {
     "name": "eu20",
     "message": "eu20     - Europe (Netherlands)",
     "hint": "Microsoft Azure"
@@ -100,9 +125,14 @@
     "hint": "Microsoft Azure"
   },
   {
-    "name": "eu30",
-    "message": "eu30     - Europe (Frankfurt)",
-    "hint": "Google Cloud"
+    "name": "eu20-002",
+    "message": "eu20-002 - Europe (Netherlands)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "eu02",
+    "message": "eu02     - Europe (Rot) - SAP EU Access",
+    "hint": "SAP Cloud Infrastructure"
   },
   {
     "name": "in30",
@@ -135,13 +165,18 @@
     "hint": "Google Cloud"
   },
   {
+    "name": "jp01",
+    "message": "jp01     - Japan (Tokyo)",
+    "hint": "SAP Cloud Infrastructure"
+  },
+  {
     "name": "sa30",
-    "message": "sa30     - KSA (Dammam)",
+    "message": "sa30     - KSA (Dammam - KSA Regulated Customers)",
     "hint": "Google Cloud"
   },
   {
     "name": "sa31",
-    "message": "sa31     - KSA (Dammam)",
+    "message": "sa31     - KSA (Dammam - KSA Non-Regulated Customers)",
     "hint": "Google Cloud"
   },
   {
@@ -153,6 +188,21 @@
     "name": "ch20",
     "message": "ch20     - Switzerland (Zurich)",
     "hint": "Microsoft Azure"
+  },
+  {
+    "name": "ae01",
+    "message": "ae01     - UAE (Dubai)",
+    "hint": "SAP Cloud Infrastructure"
+  },
+  {
+    "name": "uk20",
+    "message": "uk20     - UK South (London)",
+    "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us01",
+    "message": "us01     - US (Sterling)",
+    "hint": "SAP Cloud Infrastructure"
   },
   {
     "name": "us30",
@@ -178,6 +228,11 @@
     "name": "us21",
     "message": "us21     - US East (VA)",
     "hint": "Microsoft Azure"
+  },
+  {
+    "name": "us02",
+    "message": "us02     - US West (Colorado)",
+    "hint": "SAP Cloud Infrastructure"
   },
   {
     "name": "us11",

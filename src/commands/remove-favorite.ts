@@ -1,5 +1,6 @@
-import Enquirer from "enquirer";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { printCliError } from "../util/helper.js";
+import { autocomplete } from "../util/prompts.js";
 import chalk from "chalk";
 import { mapToPromptChoices } from "../util/favorites.js";
 
@@ -13,9 +14,7 @@ export async function removeFavorite() {
       return;
     }
 
-    const { favToRemove } = await Enquirer.prompt<{ favToRemove: string }>({
-      type: "autocomplete",
-      name: "favToRemove",
+    const favToRemove = await autocomplete({
       message: "Select favorite to remove",
       choices: mapToPromptChoices(storedFavorites),
     });
@@ -26,6 +25,6 @@ export async function removeFavorite() {
     );
     configStore.setFavorites(storedFavorites);
   } catch (error) {
-    console.error(chalk.redBright(error));
+    printCliError(error);
   }
 }

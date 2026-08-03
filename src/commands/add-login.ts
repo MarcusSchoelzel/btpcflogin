@@ -1,15 +1,15 @@
-import Enquirer from "enquirer";
 import fs from "fs";
 import chalk from "chalk";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { KeePassXcCli } from "../util/keepassxc.js";
+import { printCliError } from "../util/helper.js";
+import { autocomplete } from "../util/prompts.js";
 import path from "path";
 import { homedir } from "os";
 
 export async function addLogin() {
   try {
-    const storeDirectory = process.platform === "linux" ? getPassStorePath() : getGoPassStorePath();
-    if (!fs.existsSync(storeDirectory)) throw new Error(`Password store not found at ${storeDirectory}`);
-    let possibleLogins = readPasswordStoreLogins(storeDirectory);
+    let possibleLogins = await readPossibleLogins();
 
     if (possibleLogins.length === 0) {
       console.error(chalk.yellowBright("No Logins in Password Store"));
@@ -24,19 +24,25 @@ export async function addLogin() {
       return;
     }
 
-    const chosenLogin = (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "autocomplete",
-        name: "selection",
-        message: "Select 'pass' login",
-        choices: possibleLogins,
-      })
-    ).selection;
+    const chosenLogin = await autocomplete({
+      message: "Select 'pass' login",
+      choices: possibleLogins.map((login) => ({ value: login })),
+    });
 
     configStore.addLogin(chosenLogin);
   } catch (error) {
-    console.error(chalk.redBright(error));
+    printCliError(error);
   }
+}
+
+async function readPossibleLogins(): Promise<string[]> {
+  if (process.platform === "darwin") {
+    return new KeePassXcCli().listEntries();
+  }
+
+  const storeDirectory = process.platform === "linux" ? getPassStorePath() : getGoPassStorePath();
+  if (!fs.existsSync(storeDirectory)) throw new Error(`Password store not found at ${storeDirectory}`);
+  return readPasswordStoreLogins(storeDirectory);
 }
 
 function readPasswordStoreLogins(path: string): string[] {

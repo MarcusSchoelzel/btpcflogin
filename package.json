@@ -1,6 +1,6 @@
 {
   "name": "btpcflogin",
-  "version": "1.5.2",
+  "version": "2.0.0",
   "description": "Easy login to SAP BTP Cloud Foundry (cf cli)",
   "author": "Marcus Schölzel <marcus.schoelzel@gmx.de>",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=22.12.0"
   },
   "main": "lib/index.js",
   "type": "module",
@@ -19,29 +19,29 @@
   "scripts": {
     "prepack": "tsc",
     "local": "tsx ./src/index.ts",
-    "format": "prettier -w ./src"
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "format": "prettier -w ./src ./test"
   },
   "dependencies": {
-    "chalk": "^5.4.1",
-    "clear": "^0.1.0",
-    "commander": "^13.1.0",
-    "configstore": "^7.0.0",
-    "enquirer": "^2.4.1",
-    "figlet": "^1.8.0",
-    "ora": "^8.2.0",
-    "which": "^5.0.0",
-    "zod": "^3.24.2"
+    "@inquirer/core": "^11.2.1",
+    "@inquirer/prompts": "^8.5.2",
+    "chalk": "^6.0.0",
+    "commander": "^15.0.0",
+    "configstore": "^8.0.0",
+    "figlet": "^1.11.4",
+    "ora": "^9.4.1",
+    "which": "^7.0.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tsconfig/node14": "^14.1.2",
-    "@types/clear": "^0.1.4",
+    "@tsconfig/node22": "^22.0.5",
     "@types/configstore": "^6.0.2",
     "@types/figlet": "^1.7.0",
-    "@types/node": "^22.13.8",
+    "@types/node": "^26.1.2",
     "@types/which": "^3.0.4",
-    "prettier": "^3.5.3",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.5",
+    "typescript": "^7.0.2"
   },
   "prettier": {
     "printWidth": 120

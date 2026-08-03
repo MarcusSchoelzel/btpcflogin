@@ -1,5 +1,6 @@
-import Enquirer from "enquirer";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { printCliError } from "../util/helper.js";
+import { reorder } from "../util/prompts.js";
 import chalk from "chalk";
 import { Favorite, mapToPromptChoices } from "../util/favorites.js";
 
@@ -18,12 +19,10 @@ export async function sortFavorites() {
       return;
     }
 
-    const { sortedFavNames } = await Enquirer.prompt<{ sortedFavNames: string[] }>({
-      type: "sort",
-      name: "sortedFavNames",
+    const sortedFavNames = await reorder({
       message: "Reorder Favorites",
       choices: mapToPromptChoices(storedFavorites),
-    } as any);
+    });
 
     const sortedFavorites: Favorite[] = [];
     for (const name of sortedFavNames) {
@@ -31,6 +30,6 @@ export async function sortFavorites() {
     }
     configStore.setFavorites(sortedFavorites);
   } catch (error) {
-    console.error(chalk.redBright(error));
+    printCliError(error);
   }
 }

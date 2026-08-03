@@ -1,13 +1,14 @@
-import Enquirer from "enquirer";
-import clear from "clear";
+import { confirm, input, password } from "@inquirer/prompts";
 import chalk from "chalk";
 import figlet from "figlet";
 import { spawnSync } from "child_process";
 
 import { SSO_LOGIN_KEY, ConfigStoreProxy } from "../util/config-store.js";
 import { CloudFoundryCli } from "../util/cf-cli.js";
-import { assertCmdInPath } from "../util/helper.js";
+import { assertCmdInPath, printCliError } from "../util/helper.js";
 import { mapToPromptChoices } from "../util/favorites.js";
+import { KeePassXcCli } from "../util/keepassxc.js";
+import { autocomplete, Separator } from "../util/prompts.js";
 
 export class LoginFlow {
   private cfCli: CloudFoundryCli;
@@ -23,7 +24,7 @@ export class LoginFlow {
     try {
       await assertCmdInPath("cf");
 
-      clear();
+      console.clear();
       this.printIntro();
 
       if (this.useFavForLogin) {
@@ -32,7 +33,7 @@ export class LoginFlow {
         await this.loginInteractively();
       }
     } catch (error) {
-      console.error(chalk.redBright(error));
+      printCliError(error);
     }
   }
 
@@ -43,30 +44,19 @@ export class LoginFlow {
   private async getLoginKey() {
     const storedLogins = new ConfigStoreProxy().getLogins();
 
-    return (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "autocomplete",
-        name: "selection",
-        message: "Choose login user",
-        initial: storedLogins.length ? 1 : 0,
-        choices: [
-          {
-            name: SSO_LOGIN_KEY,
-            hint: "Single Sign On with Temporary code",
-          },
-          // separator sso from stored pass logins
-          ...(storedLogins.length
-            ? [
-                {
-                  name: "sep1",
-                  role: "separator",
-                },
-              ]
-            : []),
-          ...storedLogins,
-        ],
-      })
-    ).selection;
+    return autocomplete({
+      message: "Choose login user",
+      default: storedLogins[0],
+      choices: [
+        {
+          value: SSO_LOGIN_KEY,
+          description: "Single Sign On with Temporary code",
+        },
+        // separator sso from stored pass logins
+        ...(storedLogins.length ? [new Separator()] : []),
+        ...storedLogins.map((login) => ({ value: login })),
+      ],
+    });
   }
 
   private async loginInteractively() {
@@ -94,9 +84,7 @@ export class LoginFlow {
       return this.loginInteractively();
     }
 
-    const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
-      type: "autocomplete",
-      name: "favoriteName",
+    const favoriteName = await autocomplete({
       message: "Choose Favorite for SAP BTP CF Login",
       choices: mapToPromptChoices(favorites),
     });
@@ -116,15 +104,18 @@ export class LoginFlow {
   }
 
   private async loginWithSso(apiRegionDomain: string) {
-    const { ssoCode } = await Enquirer.prompt<{ ssoCode: string }>({
-      type: "password",
-      name: "ssoCode",
+    const ssoCode = await password({
       message: `Temporary Authentication Code for SSO ( Get one at https://login.cf.${apiRegionDomain}/passcode ):`,
+      mask: true,
     });
     return this.cfCli.loginWithSso(ssoCode);
   }
 
   private async loginWithStoredCreds(passEntry: string) {
+    if (process.platform === "darwin") {
+      return this.loginWithKeePassXc(passEntry);
+    }
+
     const passExecName = process.platform === "linux" ? "pass" : "gopass";
 
     await assertCmdInPath(passExecName);
@@ -143,6 +134,11 @@ export class LoginFlow {
       btpCredentials[0],
       this.getOriginFromLogin(btpCredentials[2]),
     );
+  }
+
+  private async loginWithKeePassXc(entry: string) {
+    const { username, password, origin } = await new KeePassXcCli().getCredentials(entry);
+    return this.cfCli.login(username, password, origin);
   }
 
   private getOriginFromLogin(origin?: string) {
@@ -202,21 +198,17 @@ export class LoginFlow {
     let overwrite = false;
 
     const promptName = async () => {
-      const { favoriteName } = await Enquirer.prompt<{ favoriteName: string }>({
-        type: "input",
-        name: "favoriteName",
-        required: true,
+      const favoriteName = await input({
         message: "Name for new Favorite",
+        validate: (value) => value.trim() !== "" || "Name must not be empty",
       });
 
       // check if favorite should be overwritten or not
       if (existingFavorites.includes(favoriteName)) {
-        const answer = await Enquirer.prompt<{ overwrite: boolean }>({
-          type: "confirm",
-          name: "overwrite",
+        overwrite = await confirm({
           message: "Favorite already exists. Do you wish to overwrite it?",
+          default: false,
         });
-        overwrite = answer.overwrite;
         if (overwrite) {
           return favoriteName;
         } else {

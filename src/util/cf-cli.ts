@@ -44,33 +44,14 @@ function checkSpawnErrors(spawnResult: SpawnSyncReturns<Buffer>) {
   }
 }
 
-/**
- * Surrounds given value in double quotes and replaces characters
- * depending on platform
- */
-function escapePassword(val: string) {
-  if (process.platform === "win32") {
-    // Escapes '"' character
-    return `"${val.replace(/"/g, `"$&`)}"`;
-  } else {
-    // Escapes '"' and '$' characters
-    return `"${val.replace(/("|\$)/g, `\\$&`)}"`;
-  }
-}
-
 export class CloudFoundryCli {
   async login(user: string, password: string, origin?: string) {
     const authProgress = ora("Authenticating you, please wait...").start();
 
     try {
-      // cf auth username "password" [--origin idp-origin]
-      checkSpawnErrors(
-        spawnSync("cf", ["auth", user, escapePassword(password), ...(origin ? ["--origin", `"${origin}"`] : [])], {
-          // win: cmd.exe shell seems to be easier to handle in terms of escaping meta characters
-          // linux: {shell: true} prevent stripping quotes
-          shell: process.platform === "win32" ? "cmd.exe" : true,
-        }),
-      );
+      // cf auth username password [--origin idp-origin]
+      // no shell is involved, so all values are passed verbatim and need no escaping
+      checkSpawnErrors(spawnSync("cf", ["auth", user, password, ...(origin ? ["--origin", origin] : [])]));
     } finally {
       authProgress.stop();
     }
@@ -82,7 +63,7 @@ export class CloudFoundryCli {
   }
 
   async loginWithSso(ssoCode: string) {
-    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", escapePassword(ssoCode)]));
+    checkSpawnErrors(spawnSync("cf", ["l", "--sso-passcode", ssoCode]));
   }
 
   async setTargetInteractively() {
@@ -107,8 +88,7 @@ export class CloudFoundryCli {
   setSpace(cfSpace: string) {
     const spaceProgress = ora("Switching space, please wait...").start();
     try {
-      // HINT: Special characters in space name are possible but are not escapable (e.g. '"', '$')
-      checkSpawnErrors(spawnSync("cf", ["target", "-s", `"${cfSpace}"`]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-s", cfSpace]));
     } finally {
       spaceProgress.stop();
     }
@@ -129,7 +109,7 @@ export class CloudFoundryCli {
   setOrg(orgName: string) {
     const orgProgress = ora("Switching organisation, please wait...").start();
     try {
-      checkSpawnErrors(spawnSync("cf", ["target", "-o", `"${orgName}"`]));
+      checkSpawnErrors(spawnSync("cf", ["target", "-o", orgName]));
     } finally {
       orgProgress.stop();
     }
@@ -141,7 +121,9 @@ export class CloudFoundryCli {
    */
   async chooseApiRegion(region?: string): Promise<{ apiRegionCode: string; apiRegionDomain: string }> {
     const apiRegionCode = region ? region : await this.getRegionCode();
-    const apiRegionDomain = apiRegionCode + (apiRegionCode === "cn40" || apiRegionCode === "cn20" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
+    const apiRegionDomain =
+      apiRegionCode +
+      (apiRegionCode === "cn40" || apiRegionCode === "cn20" ? ".platform.sapcloud.cn" : ".hana.ondemand.com");
 
     const apiProgress = ora("Switching region, please wait...").start();
 

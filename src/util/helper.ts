@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import which from "which";
@@ -17,4 +18,13 @@ export async function assertCmdInPath(cmd: string, cmdLabel?: string): Promise<v
   } catch (error) {
     throw new Error(`Required executable '${cmdLabel ?? cmd}' could not be found on the PATH`);
   }
+}
+
+/**
+ * Prints the given error to the console.
+ * Cancelled prompts (Ctrl+C in @inquirer prompts) are ignored.
+ */
+export function printCliError(error: unknown) {
+  if (error instanceof Error && error.name === "ExitPromptError") return;
+  console.error(chalk.redBright(error));
 }

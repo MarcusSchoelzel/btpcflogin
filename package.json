@@ -22,10 +22,11 @@
     "format": "prettier -w ./src"
   },
   "dependencies": {
+    "@inquirer/core": "^11.2.1",
+    "@inquirer/prompts": "^8.5.2",
     "chalk": "^6.0.0",
     "commander": "^15.0.0",
     "configstore": "^8.0.0",
-    "enquirer": "^2.4.1",
     "figlet": "^1.11.4",
     "ora": "^9.4.1",
     "which": "^7.0.0",

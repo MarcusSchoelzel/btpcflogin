@@ -1,5 +1,7 @@
-import Enquirer from "enquirer";
+import { input } from "@inquirer/prompts";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { printCliError } from "../util/helper.js";
+import { autocomplete } from "../util/prompts.js";
 import chalk from "chalk";
 import { mapToPromptChoices } from "../util/favorites.js";
 
@@ -13,9 +15,7 @@ export async function renameFavorite() {
       return;
     }
 
-    const { favToEdit } = await Enquirer.prompt<{ favToEdit: string }>({
-      type: "autocomplete",
-      name: "favToEdit",
+    const favToEdit = await autocomplete({
       message: "Select favorite to rename",
       choices: mapToPromptChoices(storedFavorites),
     });
@@ -29,14 +29,12 @@ export async function renameFavorite() {
 
     configStore.setFavorites(storedFavorites);
   } catch (error) {
-    console.error(chalk.redBright(error));
+    printCliError(error);
   }
 }
 
 async function promptForNewName(name: string, existingNames: string[]): Promise<string> {
-  const { newName } = await Enquirer.prompt<{ newName: string }>({
-    type: "input",
-    name: "newName",
+  return input({
     message: "Enter new name",
     validate(value) {
       if (value === name) {
@@ -47,5 +45,4 @@ async function promptForNewName(name: string, existingNames: string[]): Promise<
       return true;
     },
   });
-  return newName;
 }

@@ -1,12 +1,13 @@
+import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { SpawnSyncReturns, spawnSync } from "child_process";
-import Enquirer from "enquirer";
 import ora from "ora";
 import path from "path";
 import fs from "fs";
 import z from "zod";
 
 import { getDirname } from "./helper.js";
+import { autocomplete } from "./prompts.js";
 import { homedir } from "os";
 
 const NO_SPACES_FOUND = "No spaces found.";
@@ -206,14 +207,10 @@ export class CloudFoundryCli {
       cfSpace = cfSpaces[0];
       console.log(`${chalk.green("✔")} Setting only available Space ${chalk.gray("·")} ${chalk.cyan(cfSpace)}`);
     } else {
-      cfSpace = (
-        await Enquirer.prompt<{ selection: string }>({
-          type: "select",
-          name: "selection",
-          message: "Choose space",
-          choices: cfSpaces,
-        })
-      ).selection;
+      cfSpace = await select({
+        message: "Choose space",
+        choices: cfSpaces.map((space) => ({ value: space })),
+      });
     }
 
     this.setSpace(cfSpace);
@@ -229,14 +226,10 @@ export class CloudFoundryCli {
       cfOrg = cfOrgs[0];
       console.log(`${chalk.green("✔")} Setting only available org ${chalk.gray("·")} ${chalk.cyan(cfOrg)}`);
     } else {
-      cfOrg = (
-        await Enquirer.prompt<{ selection: string }>({
-          type: "select",
-          name: "selection",
-          message: "Choose organisation",
-          choices: cfOrgs,
-        })
-      ).selection;
+      cfOrg = await select({
+        message: "Choose organisation",
+        choices: cfOrgs.map((org) => ({ value: org })),
+      });
     }
 
     this.setOrg(cfOrg);
@@ -250,20 +243,22 @@ export class CloudFoundryCli {
    * @returns chosen Cloud Foundry region via prompt
    */
   private async getRegionCode(): Promise<string> {
-    return (
-      await Enquirer.prompt<{ selection: string }>({
-        type: "autocomplete",
-        name: "selection",
-        message: "Choose BTP Cloud Foundry region",
-        initial: 18,
-        choices: JSON.parse(
-          fs
-            .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {
-              encoding: "utf-8",
-            })
-            .toString(),
-        ),
-      })
-    ).selection;
+    const regions = JSON.parse(
+      fs
+        .readFileSync(path.join(getDirname(import.meta.url), "../../data/regions-data.json"), {
+          encoding: "utf-8",
+        })
+        .toString(),
+    ) as { name: string; message: string; hint: string }[];
+
+    return autocomplete({
+      message: "Choose BTP Cloud Foundry region",
+      default: "eu20",
+      choices: regions.map((region) => ({
+        value: region.name,
+        name: region.message,
+        description: region.hint,
+      })),
+    });
   }
 }

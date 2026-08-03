@@ -78,7 +78,7 @@ btpcflogin add-login
 
 ## Prerequisites
 
-[Node.js](https://nodejs.org/en/download/package-manager/#nvm) runtime 14 or higher.
+[Node.js](https://nodejs.org/en/download/package-manager/#nvm) runtime 22.12 or higher.
 
 A [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installation to clone the repo.
 

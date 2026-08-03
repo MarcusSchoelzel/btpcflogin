@@ -8,7 +8,7 @@ After installation you can use the shell command `btpcflogin` to get a guided lo
 
 ## Installation
 
-This project should run on every Linux platform.
+This project should run on every Linux platform, on Windows and on macOS.
 It is implemented and tested with WSL2 - Ubuntu.
 Therefore it should run also in headless environments.
 
@@ -90,6 +90,7 @@ To use login credentials besides the SSO option that is provided by the Cloud Fo
 | -------- | --------------------------------------------------------------------------------------------------------------------- |
 | Linux    | `pass` - the standard linux password manager ([install and setup](https://www.passwordstore.org/))                    |
 | Windows  | `gopass` - cross-platform password manager that is compatible to `pass` ([install and setup](https://www.gopass.pw/)) |
+| macOS    | `KeePassXC` - cross-platform password manager, used via its bundled `keepassxc-cli` ([install and setup](https://keepassxc.org/)) |
 
 ## Credential format
 
@@ -104,6 +105,28 @@ origin: <origin or custom IdP>
 **Hint**: The origin is only required if the credentials are from a custom identity provider.
 
 To read the username the first 10 characters of the second line are ignored.
+
+### Credential format for KeePassXC (macOS)
+
+On macOS the login data is read from a regular KeePassXC entry:
+
+- **Username**: e-mail of SAP S-user
+- **Password**: password of SAP S-user
+- Additional attribute `origin` (optional): origin key of a custom IdP
+
+The path to the KeePassXC database (`*.kdbx`) is requested once and stored in the config store.
+It can be overridden with the environment variable `BTPCFLOGIN_KDBX`.
+
+If `keepassxc-cli` is not on the PATH, `btpcflogin` automatically detects the executable that is
+bundled with the KeePassXC app (`/Applications/KeePassXC.app`) and remembers it in the config store
+after a confirmation. A custom location can be entered as well.
+
+After the first successful unlock you are asked once whether the database password should be
+remembered in the macOS Keychain. If stored, subsequent runs unlock the database automatically
+(when the database password changes, you are prompted again and the Keychain entry is updated).
+Remove the stored password anytime with `security delete-generic-password -s btpcflogin`.
+The yes/no choice is remembered as `keePassXcKeychain` in the config store - remove the property
+to be asked again.
 
 ## Bonus
 

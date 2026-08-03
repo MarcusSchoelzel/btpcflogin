@@ -1,6 +1,7 @@
 import fs from "fs";
 import chalk from "chalk";
 import { ConfigStoreProxy } from "../util/config-store.js";
+import { KeePassXcCli } from "../util/keepassxc.js";
 import { printCliError } from "../util/helper.js";
 import { autocomplete } from "../util/prompts.js";
 import path from "path";
@@ -35,6 +36,10 @@ export async function addLogin() {
 }
 
 async function readPossibleLogins(): Promise<string[]> {
+  if (process.platform === "darwin") {
+    return new KeePassXcCli().listEntries();
+  }
+
   const storeDirectory = process.platform === "linux" ? getPassStorePath() : getGoPassStorePath();
   if (!fs.existsSync(storeDirectory)) throw new Error(`Password store not found at ${storeDirectory}`);
   return readPasswordStoreLogins(storeDirectory);

@@ -7,6 +7,7 @@ import { SSO_LOGIN_KEY, ConfigStoreProxy } from "../util/config-store.js";
 import { CloudFoundryCli } from "../util/cf-cli.js";
 import { assertCmdInPath, printCliError } from "../util/helper.js";
 import { mapToPromptChoices } from "../util/favorites.js";
+import { KeePassXcCli } from "../util/keepassxc.js";
 import { autocomplete, Separator } from "../util/prompts.js";
 
 export class LoginFlow {
@@ -111,6 +112,10 @@ export class LoginFlow {
   }
 
   private async loginWithStoredCreds(passEntry: string) {
+    if (process.platform === "darwin") {
+      return this.loginWithKeePassXc(passEntry);
+    }
+
     const passExecName = process.platform === "linux" ? "pass" : "gopass";
 
     await assertCmdInPath(passExecName);
@@ -129,6 +134,11 @@ export class LoginFlow {
       btpCredentials[0],
       this.getOriginFromLogin(btpCredentials[2]),
     );
+  }
+
+  private async loginWithKeePassXc(entry: string) {
+    const { username, password, origin } = await new KeePassXcCli().getCredentials(entry);
+    return this.cfCli.login(username, password, origin);
   }
 
   private getOriginFromLogin(origin?: string) {

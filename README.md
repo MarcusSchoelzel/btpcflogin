@@ -21,7 +21,7 @@ It runs on Linux, Windows and macOS - implemented and tested with WSL2 - Ubuntu 
 ## Prerequisites
 
 - The Cloud Foundry CLI `cf` ([install instructions](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html))
-- [Node.js](https://nodejs.org/en/download/package-manager/#nvm) runtime 22.12 or higher
+- [Node.js](https://nodejs.org/en/download/package-manager/#nvm) runtime 22.13 or higher
 - A [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installation, if you want to run from source
 - A credential manager, to use stored login credentials besides the SSO option that is provided by the Cloud Foundry CLI:
 
